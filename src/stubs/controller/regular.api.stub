@@ -1,0 +1,48 @@
+<?php
+
+/** @noinspection PhpMissingReturnTypeInspection */
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use {{ rootNamespace }}Http\Controllers\Controller;
+use {{ requestFullModel }};
+use {{ resourceFullModel }};
+use Illuminate\Http\Request;
+
+class {{ class }} extends Controller
+{
+    public function index(Request $request)
+    {
+        if ($term = $request->q) {
+            ${{ pluralModelVariable }} = {{ model }}::where('name', 'like', "%$term%")->paginate();
+        } else {
+            ${{ pluralModelVariable }} = {{ model }}::paginate();
+        }
+        return {{ resourceModel }}::collection(${{ pluralModelVariable }});
+    }
+
+    public function store({{ requestModel }} $request)
+    {
+        $fields = $request->validated();
+        ${{ modelVariable }} = {{ model }}::create($fields);
+        return new {{ resourceModel }}(${{ modelVariable }});
+    }
+
+    public function show({{ model }} ${{ modelVariable }})
+    {
+        return new {{ resourceModel }}(${{ modelVariable }});
+    }
+
+    public function update({{ requestModel }} $request, {{ model }} ${{ modelVariable }})
+    {
+        $fields = $request->validated();
+        ${{ modelVariable }}->update($fields);
+        return new {{ resourceModel }}(${{ modelVariable }});
+    }
+
+    public function destroy({{ model }} ${{ modelVariable }})
+    {
+        ${{ modelVariable }}->delete();
+    }
+}

@@ -1,0 +1,71 @@
+<?php
+
+/** @noinspection PhpMissingReturnTypeInspection */
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use {{ rootNamespace }}Http\Controllers\Controller;
+use {{ requestFullModel }};
+use Illuminate\Http\Request;
+
+class {{ class }} extends Controller
+{
+    public function index(Request $request)
+    {
+        if ($term = $request->q) {
+            ${{ pluralModelVariable }} = {{ model }}::where('name', 'like', "%$term%")->paginate();
+        } else {
+            ${{ pluralModelVariable }} = {{ model }}::paginate();
+        }
+        return view('{{ viewprefix }}.index', compact('{{ pluralModelVariable }}'));
+    }
+
+    public function create()
+    {
+        ${{ modelVariable }} = null;
+        $action = route('{{ routeprefix }}.store');
+        $referrer = request()->headers->get('referer');
+        return view('{{ viewprefix }}.edit', compact('{{ modelVariable }}', 'action', 'referrer'));
+    }
+
+    public function store({{ requestModel }} $request)
+    {
+        $referrer = $request->get('_referrer');
+        $redirectTo = $referrer ?: route('{{ routeprefix }}.index');
+
+        $fields = $request->validated();
+        {{ model }}::create($fields);
+
+        return redirect($redirectTo)->with('success', '{{ model }} created successfully');
+    }
+
+    public function show({{ model }} ${{ modelVariable }})
+    {
+        return view('{{ viewprefix }}.show', compact('{{ modelVariable }}'));
+    }
+
+    public function edit({{ model }} ${{ modelVariable }})
+    {
+        $action = route('{{ routeprefix }}.update', ${{ modelVariable }});
+        $referrer = request()->headers->get('referer');
+        return view('{{ viewprefix }}.edit', compact('{{ modelVariable }}', 'action', 'referrer'));
+    }
+
+    public function update({{ requestModel }} $request, {{ model }} ${{ modelVariable }})
+    {
+        $fields = $request->validated();
+        ${{ modelVariable }}->update($fields);
+
+        $referrer = $request->get('_referrer');
+        $redirectTo = $referrer ?: route('{{ routeprefix }}.index');
+        return redirect($redirectTo)->with('success', '{{ model }} updated successfully');
+    }
+
+    public function destroy({{ model }} ${{ modelVariable }})
+    {
+        ${{ modelVariable }}->delete();
+
+        return redirect()->route('{{ routeprefix }}.index')->with('success', '{{ model }} deleted successfully');
+    }
+}

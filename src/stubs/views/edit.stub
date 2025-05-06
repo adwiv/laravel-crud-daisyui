@@ -1,0 +1,62 @@
+<x-layouts.crud>
+
+<x-slot name="title">{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}</x-slot>
+
+<x-slot name="breadcrumbs">
+    <li class="breadcrumb-item"><a href="{{route('{{ homeroute }}')}}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{route('{{ routeprefix }}.index')}}">{{ pluralModelTitle }}</a></li>
+    @isset(${{ modelVariable }})
+        <li class="breadcrumb-item"><a href="{{route('{{ routeprefix }}.show', ${{ modelVariable }})}}">{{ ${{ modelVariable }}->name ?? ${{ modelVariable }}->id }}</a></li>
+        <li class="breadcrumb-item active">Edit</li>
+    @else
+        <li class="breadcrumb-item active">Create</li>
+    @endisset
+</x-slot>
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title text-lg">{{ ${{ modelVariable }} ? 'Edit {{ model }}' : 'Create {{ model }}' }}</div>
+        <div class="card-tools mr-0">
+            <button type="reset" form="crud-edit" class="btn btn-sm btn-outline-warning">Reset</button>
+        </div>
+    </div>
+    <div class="card-body">
+        @if ($errors->any())
+        <div class="alert alert-warning">
+            <ul class="py-0 my-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+        <form id="crud-edit" method="post" class="needs-validation" novalidate autocomplete="off" action="{{ $action }}">
+            @if (${{ modelVariable }}) @method('PUT') @endif
+            @csrf
+            <input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}">
+            {{ FIELDS }}
+        </form>
+    </div>
+    <div class="card-footer">
+        <div class="row">
+            <div class="col-sm-4">
+                <a class="btn btn-link pl-0" href="{{ $referrer ?? route('{{ routeprefix }}.index') }}">&laquo; Back</a>
+            </div>
+            <div class="col-sm-4 text-center">
+            </div>
+            <div class="col-sm-4 text-right">
+                <button type="submit" form="crud-edit" class="btn btn-info">{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('js')
+    <script src="{{ asset('js/crud-edit.js') }}"></script>
+    <script>
+        trackFormModification("crud-edit");
+    </script>
+@endpush
+
+</x-layouts.crud>

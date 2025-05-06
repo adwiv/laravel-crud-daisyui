@@ -1,0 +1,74 @@
+<?php
+
+/** @noinspection PhpMissingReturnTypeInspection */
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use {{ namespacedParentModel }};
+use {{ rootNamespace }}Http\Controllers\Controller;
+use {{ requestFullModel }};
+use Illuminate\Http\Request;
+
+class {{ class }} extends Controller
+{
+    public function index(Request $request, {{ parentModel }} ${{ parentModelVariable }})
+    {
+        if ($term = $request->q) {
+            ${{ pluralModelVariable }} = ${{ parentModelVariable }}->{{ pluralModelVariable }}()->where('name', 'like', "%$term%")->paginate();
+        } else {
+            ${{ pluralModelVariable }} = ${{ parentModelVariable }}->{{ pluralModelVariable }}()->paginate();
+        }
+        return view('{{ viewprefix }}.index', compact('{{ parentModelVariable }}', '{{ pluralModelVariable }}'));
+    }
+
+    public function create({{ parentModel }} ${{ parentModelVariable }})
+    {
+        ${{ modelVariable }} = null;
+        $action = route('{{ routeprefix }}.store', ${{ parentModelVariable }});
+        $referrer = request()->headers->get('referer');
+
+        return view('{{ viewprefix }}.edit', compact('{{ modelVariable }}', '{{ parentModelVariable }}', 'action', 'referrer'));
+    }
+
+    public function store({{ requestModel }} $request, {{ parentModel }} ${{ parentModelVariable }})
+    {
+        $fields = $request->validated();
+        ${{ parentModelVariable }}->{{ pluralModelVariable }}()->create($fields);
+
+        $referrer = $request->get('_referrer');
+        $redirectTo = $referrer ?: route('{{ routeprefix }}.index', ${{ parentModelVariable }});
+        return redirect($redirectTo)->with('success', '{{ model }} created successfully');
+    }
+
+    public function show({{ model }} ${{ modelVariable }})
+    {
+        ${{ parentModelVariable }} = ${{ modelVariable }}->{{ parentModelVariable }};
+        return view('{{ viewprefix }}.show', compact('{{ modelVariable }}', '{{ parentModelVariable }}'));
+    }
+
+    public function edit({{ model }} ${{ modelVariable }})
+    {
+        ${{ parentModelVariable }} = ${{ modelVariable }}->{{ parentModelVariable }};
+        $action = route('{{ shallowrouteprefix }}.update', ${{ modelVariable }});
+        $referrer = request()->headers->get('referer');
+        return view('{{ viewprefix }}.edit', compact('{{ modelVariable }}', '{{ parentModelVariable }}', 'action', 'referrer'));
+    }
+
+    public function update({{ requestModel }} $request, {{ model }} ${{ modelVariable }})
+    {
+        $fields = $request->validated();
+        ${{ modelVariable }}->update($fields);
+
+        $referrer = $request->get('_referrer');
+        $redirectTo = $referrer ?: route('{{ routeprefix }}.index');
+        return redirect($redirectTo)->with('success', '{{ model }} updated successfully');
+    }
+
+    public function destroy({{ model }} ${{ modelVariable }})
+    {
+        ${{ modelVariable }}->delete();
+
+        return redirect()->route('{{ routeprefix }}.index')->with('success', '{{ model }} deleted successfully');
+    }
+}

@@ -1,0 +1,49 @@
+<?php
+
+/** @noinspection PhpMissingReturnTypeInspection */
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use {{ namespacedParentModel }};
+use {{ rootNamespace }}Http\Controllers\Controller;
+use {{ requestFullModel }};
+use {{ resourceFullModel }};
+use Illuminate\Http\Request;
+
+class {{ class }} extends Controller
+{
+    public function index(Request $request, {{ parentModel }} ${{ parentModelVariable }})
+    {
+        if ($term = $request->q) {
+            ${{ pluralModelVariable }} = ${{ parentModelVariable }}->{{ pluralModelVariable }}()->where('name', 'like', "%$term%")->paginate();
+        } else {
+            ${{ pluralModelVariable }} = ${{ parentModelVariable }}->{{ pluralModelVariable }}()->paginate();
+        }
+        return {{ resourceModel }}::collection(${{ pluralModelVariable }});
+    }
+
+    public function store({{ requestModel }} $request, {{ parentModel }} ${{ parentModelVariable }})
+    {
+        $fields = $request->validated();
+        ${{ modelVariable }} = ${{ parentModelVariable }}->{{ pluralModelVariable }}()->create($fields);
+        return new {{ resourceModel }}(${{ modelVariable }});
+    }
+
+    public function show({{ model }} ${{ modelVariable }})
+    {
+        return new {{ resourceModel }}(${{ modelVariable }});
+    }
+
+    public function update({{ requestModel }} $request, {{ model }} ${{ modelVariable }})
+    {
+        $fields = $request->validated();
+        ${{ modelVariable }}->update($fields);
+        return new {{ resourceModel }}(${{ modelVariable }});
+    }
+
+    public function destroy({{ model }} ${{ modelVariable }})
+    {
+        ${{ modelVariable }}->delete();
+    }
+}

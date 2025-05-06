@@ -1,0 +1,28 @@
+{
+    "name": "adwiv/laravel-crud-adminlte",
+    "replace": {
+        "adwiv/laravel-crud-generator": "*"
+    },
+    "description": "Generate CRUD Model, Controller, Resource, Request and Views for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": ">=11.0",
+        "jeroennoten/laravel-adminlte": "^3.14"
+    },
+    "autoload": {
+        "psr-4": {
+            "Adwiv\\Laravel\\CrudGenerator\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Adwiv\\Laravel\\CrudGenerator\\CrudGeneratorServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
