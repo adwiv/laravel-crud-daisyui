@@ -1,18 +1,18 @@
 
 <x-daisyui title="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}'}}">
 
-
-
 <x-slot name="breadcrumbs">
-    <li class="breadcrumb-item"><a href="{{route('{{ homeroute }}')}}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{route('{{ routeprefix }}.index')}}">{{ pluralModelTitle }}</a></li>
+    <x-daisyui.breadcrumbs text="Home" href="{{ route('{{ homeroute }}') }}" />
+   <x-daisyui.breadcrumbs href="{{ route('{{ routeprefix }}.index') }}">{{ pluralModelTitle }}</x-daisyui.breadcrumbs>
+
     @isset(${{ modelVariable }})
-        <li class="breadcrumb-item"><a href="{{route('{{ routeprefix }}.show', ${{ modelVariable }})}}">{{ ${{ modelVariable }}->name ?? ${{ modelVariable }}->id }}</a></li>
-        <li class="breadcrumb-item active">Edit</li>
+        <x-daisyui.breadcrumbs href="{{ route('{{ routeprefix }}.show', ${{ modelVariable }}) }}">{{ ${{ modelVariable }}->name ?? ${{ modelVariable }}->id }}</x-daisyui.breadcrumbs>
+        <x-daisyui.breadcrumbs text="Edit" />
     @else
-        <li class="breadcrumb-item active">Create</li>
+        <x-daisyui.breadcrumbs text="Create" />
     @endisset
 </x-slot>
+
 
 <div class="card">
     <div class="card-header">

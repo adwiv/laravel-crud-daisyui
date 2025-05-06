@@ -1,5 +1,5 @@
-<x-layouts.crud>
-<x-slot name="title">{{ $student ? 'Update Student' : 'Create Student' }}</x-slot>
+
+<x-daisyui title="{{ $student ? 'Update Student' : 'Create Student'}}">
 
 <x-slot name="breadcrumbs">
     <li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
@@ -55,7 +55,7 @@
                     $genders = ['male'=>'Male','female'=>'Female'];
                 @endphp
                 <x-crud.group id="gender" label="Gender" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="select" name="gender" required :options="$genders"/>
+                    <x-crud.choices type="radio" name="gender" required :options="$genders"/>
                 </x-crud.group>
 
                 <x-crud.group id="degree" label="Degree" class="col-sm-6 col-lg-3">
@@ -63,7 +63,7 @@
                 </x-crud.group>
 
                 <x-crud.group id="likes" label="Likes" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="select" name="likes" required :options="App\Enums\Likes::array()"/>
+                    <x-crud.choices type="radio" name="likes" required :options="App\Enums\Likes::array()"/>
                 </x-crud.group>
 
                 <x-crud.group id="address" label="Address" class="col-sm-6 col-lg-3">
@@ -97,4 +97,4 @@
     </script>
 @endpush
 
-</x-layouts.crud>
+</x-daisyui>
