@@ -1,6 +1,7 @@
-<x-layouts.crud>
 
-<x-slot name="title">{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}</x-slot>
+<x-daisyui title="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}'}}">
+
+
 
 <x-slot name="breadcrumbs">
     <li class="breadcrumb-item"><a href="{{route('{{ homeroute }}')}}">Home</a></li>
@@ -59,4 +60,4 @@
     </script>
 @endpush
 
-</x-layouts.crud>
+</x-daisyui>
