@@ -28,12 +28,22 @@ php artisan crud:all Student [--table students]
 
 You can also generate individual files:
 ```shell
+# Create Student model from students table
 php artisan crud:model Student
+# Create enums for all enum & set fields in students table
+php artisan curd:enum Student
+# Create the Request class for Student Model
 php artisan crud:request StudentRequest
+# Create the Resource class for Student Model
 php artisan crud:resource StudentResource
+# Create the Resource controller Student Model
 php artisan crud:controller Admin/StudentController
+# Create the API Resource controller Student Model
 php artisan crud:controller Api/StudentController --api
+# Create the index view for student model (admin/students/index.blade.php)
 php artisan crud:view admin.students.index
+# Create the index view for student model (admin/students/show.blade.php)
 php artisan crud:view admin.students.show
+# Create the index view for student model (admin/students/edit.blade.php)
 php artisan crud:view admin.students.edit
 ```

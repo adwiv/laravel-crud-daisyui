@@ -301,7 +301,7 @@ class ViewMakeCommand extends GeneratorCommand
                 $FIELDS .= <<<END
 
                 <x-crud.group id="$field" label="$fieldName" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="select" name="$field" :options="['FALSE','TRUE']{$required}"/>
+                    <x-crud.choices type="select" name="$field" :options="['FALSE','TRUE']"{$required}"/>
                 </x-crud.group>
 
 END;
