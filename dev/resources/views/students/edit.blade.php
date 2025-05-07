@@ -2,15 +2,17 @@
 <x-daisyui title="{{ $student ? 'Update Student' : 'Create Student'}}">
 
 <x-slot name="breadcrumbs">
-    <li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{route('students.index')}}">Students</a></li>
+    <x-daisyui.breadcrumbs text="Home" href="{{ route('home') }}" />
+   <x-daisyui.breadcrumbs href="{{ route('students.index') }}">Students</x-daisyui.breadcrumbs>
+
     @isset($student)
-        <li class="breadcrumb-item"><a href="{{route('students.show', $student)}}">{{ $student->name ?? $student->id }}</a></li>
-        <li class="breadcrumb-item active">Edit</li>
+        <x-daisyui.breadcrumbs href="{{ route('students.show', $student) }}">{{ $student->name ?? $student->id }}</x-daisyui.breadcrumbs>
+        <x-daisyui.breadcrumbs text="Edit" />
     @else
-        <li class="breadcrumb-item active">Create</li>
+        <x-daisyui.breadcrumbs text="Create" />
     @endisset
 </x-slot>
+
 
 <div class="card">
     <div class="card-header">
