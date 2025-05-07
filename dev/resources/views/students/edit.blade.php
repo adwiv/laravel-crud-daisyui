@@ -13,10 +13,7 @@
     </x-slot>
 
     <div class="card card-border border-base-300 bg-base-100">
-        <div class="card-body p-6 gap-5">
-        <div class="flex justify-end">            
-            <x-daisyui.button type="reset" form="crud-edit" class="btn-outline" color="warning" label="Reset" />
-        </div>
+        <div class="card-body p-6 gap-5">       
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
                     <x-daisyui.alert type="warning" :title="$error" />
@@ -49,9 +46,13 @@
                 </x-crud.model>
             </form>
         <div class="flex justify-between">
-            <a class="btn btn-outline" href="{{ $referrer ?? route('students.index') }}">&laquo; Back</a>
+        <div>
+            <a class="btn btn-outline" href="{{ $referrer ?? route('students.index') }}">&laquo; Back</a>  
+            <x-daisyui.button type="reset" form="crud-edit" class="btn-outline" color="warning" label="Reset" />
+            </div>
+            <div>
             <x-daisyui.button type="submit" form="crud-edit" color="info" label="{{ $student ? 'Update Student' : 'Create Student' }}" />           
-        </div>
+            </div>
         </div>
     </div>
 
