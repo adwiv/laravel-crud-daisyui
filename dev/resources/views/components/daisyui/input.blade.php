@@ -21,7 +21,7 @@
       throw new \Exception('Model must be an object or an array');
   }
 
-  $types = ['textarea', 'text', 'email', 'number', 'password', 'file', 'date', 'time', 'datetime-local', 'search', 'tel', 'url'];
+  $types = ['textarea', 'text', 'email', 'number', 'password', 'file', 'date', 'time', 'datetime-local', 'search', 'tel', 'url','hidden'];
   if (!in_array($type, $types)) {
       throw new \Exception("Invalid input type: $type");
   }
@@ -79,7 +79,7 @@
 @endif
 
 @if ($type === 'textarea')
-  <label {{ $attributes->merge(['class' => 'input textarea !h-full group w-full pb-0 pe-0  items-stretch'])->only('class') }}>  
+  <label {{ $attributes->merge(['class' => 'input textarea !h-full group w-full pb-0 pe-0   items-stretch'])->only('class') }}>  
     @if(isset($prefix) || isset($prefixIcon))
     <label class="label !me-0 mb-2 self-stretch !h-auto"> 
         @isset($prefixIcon)
@@ -108,7 +108,8 @@
       @endif
   </label>
 @else
-  <label {{ $attributes->merge(['class' => 'input group w-full'])->only('class') }}>  
+    
+  <label {{ $attributes->merge(['class' => 'input group w-full '. ($type =='hidden' ? 'hidden' : '')])->only('class') }}>  
         @if(isset($prefix) || isset($prefixIcon))
         <label class="label !me-0"> 
             @isset($prefixIcon)

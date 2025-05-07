@@ -1,102 +1,65 @@
+<x-daisyui title="{{ $student ? 'Edit Student' : 'Create Student' }}">
 
-<x-daisyui title="{{ $student ? 'Update Student' : 'Create Student'}}">
+    <x-slot name="breadcrumbs">
+        <x-daisyui.breadcrumbs text="Home" href="{{ route('home') }}" />
+        <x-daisyui.breadcrumbs href="{{ route('students.index') }}" text="Students" />
+        @isset($student)
+            <x-daisyui.breadcrumbs href="{{ route('students.show', $student) }}"
+                text="{{ $student->name ?? $student->id }}" />
+            <x-daisyui.breadcrumbs text="Edit" />
+        @else
+            <x-daisyui.breadcrumbs text="Create" />
+        @endisset
+    </x-slot>
 
-<x-slot name="breadcrumbs">
-    <x-daisyui.breadcrumbs text="Home" href="{{ route('home') }}" />
-   <x-daisyui.breadcrumbs href="{{ route('students.index') }}">Students</x-daisyui.breadcrumbs>
-
-    @isset($student)
-        <x-daisyui.breadcrumbs href="{{ route('students.show', $student) }}">{{ $student->name ?? $student->id }}</x-daisyui.breadcrumbs>
-        <x-daisyui.breadcrumbs text="Edit" />
-    @else
-        <x-daisyui.breadcrumbs text="Create" />
-    @endisset
-</x-slot>
-
-
-<div class="card">
-    <div class="card-header">
-        <div class="card-title text-lg">{{ $student ? 'Edit Student' : 'Create Student' }}</div>
-        <div class="card-tools mr-0">
-            <button type="reset" form="crud-edit" class="btn btn-sm btn-outline-warning">Reset</button>
+    <div class="card card-border border-base-300 bg-base-100">
+        <div class="card-body p-6 gap-5">
+        <div class="flex justify-end">            
+            <x-daisyui.button type="reset" form="crud-edit" class="btn-outline" color="warning" label="Reset" />
         </div>
-    </div>
-    <div class="card-body">
-        @if ($errors->any())
-        <div class="alert alert-warning">
-            <ul class="py-0 my-0">
+            @if ($errors->any())
                 @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+                    <x-daisyui.alert type="warning" :title="$error" />
                 @endforeach
-            </ul>
+            @endif
+
+            <form id="crud-edit" method="post" class="needs-validation" novalidate autocomplete="off"
+                action="{{ $action }}">
+                @if ($student)
+                    @method('PUT')
+                @endif
+                @csrf
+                <x-daisyui.input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}" />
+                <x-crud.model class="row" :model="$student" class="flex flex-col gap-3">
+                    <x-daisyui.input  label="Name" id="name" name="name" required />
+                    <x-daisyui.input  label="Email" id="email" name="email" type="email" required />
+                    <x-daisyui.input  label="Phone" id="phone" name="phone" type="tel" required />
+                    <x-daisyui.input  label="Date Of Birth" id="date_of_birth" name="date_of_birth" type="date"
+                        required />
+                    <x-daisyui.choices  label="Gender" id="gender" name="gender" type="radio" required
+                        :options="['male' => 'Male', 'female' => 'Female']" />
+                    <x-daisyui.choices  label="Degree" id="degree" name="degree" type="radio" required
+                        :options="App\Enums\Degree::array()" />
+                    <x-daisyui.choices  label="Likes" id="likes" name="likes" type="radio" required
+                        :options="App\Enums\Likes::array()" />
+                    <x-daisyui.input  label="Address" id="address" name="address" type="textarea" rows="5"
+                        required />
+                    <x-daisyui.choices  label="Is Active" id="is_active" name="is_active" type="select" required
+                        :options="['FALSE' => 'FALSE', 'TRUE' => 'TRUE']" />
+                </x-crud.model>
+            </form>
+        <div class="flex justify-between">
+            <a class="btn btn-outline" href="{{ $referrer ?? route('students.index') }}">&laquo; Back</a>
+            <x-daisyui.button type="submit" form="crud-edit" color="info" label="{{ $student ? 'Update Student' : 'Create Student' }}" />           
         </div>
-        @endif
-
-        <form id="crud-edit" method="post" class="needs-validation" novalidate autocomplete="off" action="{{ $action }}">
-            @if ($student) @method('PUT') @endif
-            @csrf
-            <input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}">
-            <x-crud.model class="row" :model="$student">
-            <x-crud.group id="name" label="Name" class="col-sm-6 col-lg-3">
-                    <x-crud.input type="text" name="name" required/>
-                </x-crud.group>
-
-                <x-crud.group id="email" label="Email" class="col-sm-6 col-lg-3">
-                    <x-crud.input type="email" name="email" required/>
-                </x-crud.group>
-
-                <x-crud.group id="phone" label="Phone" class="col-sm-6 col-lg-3">
-                    <x-crud.input type="tel" name="phone" required/>
-                </x-crud.group>
-
-                <x-crud.group id="date_of_birth" label="Date Of Birth" class="col-sm-6 col-lg-3">
-                    <x-crud.input type="date" name="date_of_birth" required/>
-                </x-crud.group>
-
-                @php
-                    $genders = ['male'=>'Male','female'=>'Female'];
-                @endphp
-                <x-crud.group id="gender" label="Gender" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="radio" name="gender" required :options="$genders"/>
-                </x-crud.group>
-
-                <x-crud.group id="degree" label="Degree" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="radio" name="degree" required :options="App\Enums\Degree::array()"/>
-                </x-crud.group>
-
-                <x-crud.group id="likes" label="Likes" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="radio" name="likes" required :options="App\Enums\Likes::array()"/>
-                </x-crud.group>
-
-                <x-crud.group id="address" label="Address" class="col-sm-6 col-lg-3">
-                    <x-crud.textarea name="address" rows="5" required/>
-                </x-crud.group>
-
-                <x-crud.group id="is_active" label="Is Active" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="select" name="is_active" :options="['FALSE','TRUE']" required/>
-                </x-crud.group>
-        </x-crud.model>
-        </form>
-    </div>
-    <div class="card-footer">
-        <div class="row">
-            <div class="col-sm-4">
-                <a class="btn btn-link pl-0" href="{{ $referrer ?? route('students.index') }}">&laquo; Back</a>
-            </div>
-            <div class="col-sm-4 text-center">
-            </div>
-            <div class="col-sm-4 text-right">
-                <button type="submit" form="crud-edit" class="btn btn-info">{{ $student ? 'Update Student' : 'Create Student' }}</button>
-            </div>
         </div>
     </div>
-</div>
 
-@push('js')
-    <script src="{{ asset('js/crud-edit.js') }}"></script>
-    <script>
-        trackFormModification("crud-edit");
-    </script>
-@endpush
+    @push('js')
+        <script src="{{ asset('js/crud-edit.js') }}"></script>
+        <script>
+            trackFormModification("crud-edit");
+        </script>
+    @endpush
 
 </x-daisyui>

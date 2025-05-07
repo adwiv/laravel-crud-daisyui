@@ -3,10 +3,10 @@
 
 <x-slot name="breadcrumbs">
     <x-daisyui.breadcrumbs text="Home" href="{{ route('{{ homeroute }}') }}" />
-   <x-daisyui.breadcrumbs href="{{ route('{{ routeprefix }}.index') }}">{{ pluralModelTitle }}</x-daisyui.breadcrumbs>
+   <x-daisyui.breadcrumbs href="{{ route('{{ routeprefix }}.index') }}" text="{{ pluralModelTitle }}" />
 
     @isset(${{ modelVariable }})
-        <x-daisyui.breadcrumbs href="{{ route('{{ routeprefix }}.show', ${{ modelVariable }}) }}">{{ ${{ modelVariable }}->name ?? ${{ modelVariable }}->id }}</x-daisyui.breadcrumbs>
+        <x-daisyui.breadcrumbs href="{{ route('{{ routeprefix }}.show', ${{ modelVariable }}) }}" text="{{ ${{ modelVariable }}->name ?? ${{ modelVariable }}->id }}" />
         <x-daisyui.breadcrumbs text="Edit" />
     @else
         <x-daisyui.breadcrumbs text="Create" />

@@ -155,7 +155,7 @@
       </select>
     </label>
   @else
-    <div class="flex flex-wrap gap-3 py-2">
+    <div class="flex flex-wrap gap-3">
       @foreach ($options as $key => $option)
         @php
           $selected = in_array("$key", $value);
