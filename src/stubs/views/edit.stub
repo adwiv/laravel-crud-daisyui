@@ -14,43 +14,30 @@
 </x-slot>
 
 
-<div class="card">
-    <div class="card-header">
-        <div class="card-title text-lg">{{ ${{ modelVariable }} ? 'Edit {{ model }}' : 'Create {{ model }}' }}</div>
-        <div class="card-tools mr-0">
-            <button type="reset" form="crud-edit" class="btn btn-sm btn-outline-warning">Reset</button>
-        </div>
-    </div>
-    <div class="card-body">
-        @if ($errors->any())
-        <div class="alert alert-warning">
-            <ul class="py-0 my-0">
+<div class="card card-border border-base-300 bg-base-100">         
+        <div class="card-body p-6 gap-5">
+            @if ($errors->any())
                 @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+                    <x-daisyui.alert type="warning" :title="$error" />
                 @endforeach
-            </ul>
-        </div>
-        @endif
+            @endif
 
-        <form id="crud-edit" method="post" class="needs-validation" novalidate autocomplete="off" action="{{ $action }}">
-            @if (${{ modelVariable }}) @method('PUT') @endif
-            @csrf
-            <input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}">
-            {{ FIELDS }}
-        </form>
-    </div>
-    <div class="card-footer">
-        <div class="row">
-            <div class="col-sm-4">
-                <a class="btn btn-link pl-0" href="{{ $referrer ?? route('{{ routeprefix }}.index') }}">&laquo; Back</a>
-            </div>
-            <div class="col-sm-4 text-center">
-            </div>
-            <div class="col-sm-4 text-right">
-                <button type="submit" form="crud-edit" class="btn btn-info">{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}</button>
+            <form id="crud-edit" method="post" class="needs-validation" novalidate autocomplete="off" action="{{ $action }}">
+                @if (${{ modelVariable }}) @method('PUT') @endif
+                @csrf
+                <x-daisyui.input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}" />
+                {{ FIELDS }}
+            </form>
+            <div class="flex justify-between">
+                    <div>         
+                        <a class="btn" href="{{ $referrer ?? route('{{ routeprefix }}.index') }}">&laquo; Back</a>           
+                        <x-daisyui.button type="reset" form="crud-edit" class="btn-outline" color="warning" label="Reset"/>             
+                    </div>
+                    <div>
+                        <x-daisyui.button type="submit" form="crud-edit" color="info" label="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}" />
+                    </div>       
             </div>
         </div>
-    </div>
 </div>
 
 @push('js')

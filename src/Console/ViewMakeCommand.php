@@ -300,9 +300,9 @@ class ViewMakeCommand extends GeneratorCommand
             if ($castType === 'boolean') {
                 $FIELDS .= <<<END
 
-                <x-crud.group id="$field" label="$fieldName" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="select" name="$field" :options="['FALSE','TRUE']"{$required}/>
-                </x-crud.group>
+             
+
+                <x-daisyui.choices type="select" id="$field" label="$fieldName" name="$field" :options="['FALSE','TRUE']"{$required}/>
 
 END;
             } else if ($columnInfo->type == 'enum' || $columnInfo->type == 'set') {
@@ -319,9 +319,9 @@ END;
                 if ($isBackedEnum) {
                     $FIELDS .= <<<END
 
-                <x-crud.group id="$field" label="$fieldName" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="$type" name="$choiceName"{$required} :options="$enumClass::array()"/>
-                </x-crud.group>
+              
+
+                <x-daisyui.choices type="$type" id="$field" label="$fieldName" name="$choiceName"{$required} :options="$enumClass::array()"/>
 
 END;
                 } else {
@@ -337,9 +337,8 @@ END;
                 @php
                     \$$pluralFieldVar = [$options];
                 @endphp
-                <x-crud.group id="$field" label="$fieldName" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="$type" name="$choiceName"{$required} :options="\$$pluralFieldVar"/>
-                </x-crud.group>
+               
+                <x-daisyui.choices type="$type" id="$field"  label="$fieldName" name="$choiceName"{$required} :options="\$$pluralFieldVar"/>
 
 END;
                 }
@@ -351,9 +350,8 @@ END;
 
                 $FIELDS .= <<<END
 
-                <x-crud.group id="$field" label="$fieldName" class="col-sm-6 col-lg-3">
-                    <x-crud.choices type="select" name="$field" :options="$foreignClass::all()"{$valueKey}{$required}/>
-                </x-crud.group>
+              
+                <x-daisyui.choices type="select" id="$field" label="$fieldName" name="$field" :options="$foreignClass::all()"{$valueKey}{$required}/>
 
 END;
             } else if (
@@ -362,10 +360,9 @@ END;
             ) {
                 $FIELDS .= <<<END
 
-                <x-crud.group id="$field" label="$fieldName" class="col-sm-6 col-lg-3">
-                    <x-crud.textarea name="$field" rows="5"{$required}/>
-                </x-crud.group>
+            
 
+                <x-daisyui.textarea id="$field" label="$fieldName" name="$field" rows="5"{$required}/>
 END;
             } else {
                 $type = 'type="text"';
@@ -390,9 +387,9 @@ END;
 
                 $FIELDS .= <<<END
 
-                <x-crud.group id="$field" label="$fieldName" class="col-sm-6 col-lg-3">
-                    <x-crud.input $type name="$field"{$required}/>
-                </x-crud.group>
+              
+
+                <x-daisyui.input $type id="$field" label="$fieldName" name="$field"{$required}/>
 
 END;
             }
@@ -401,7 +398,7 @@ END;
         $FIELDS = trim($FIELDS);
 
         $FIELDS = <<<END
-        <x-crud.model class="row" :model="\$$modelVariable">
+        <x-crud.model class="flex flex-col gap-3" :model="\$$modelVariable">
             $FIELDS
         </x-crud.model>
 
