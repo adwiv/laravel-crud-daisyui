@@ -13,7 +13,7 @@
     'prefix' => null,
     'suffix' => null,
     'hint' => null,
-    'error' => null,   
+    'error' => null,
 ])
 @aware(['id', 'model' => null])
 @php
@@ -21,7 +21,7 @@
       throw new \Exception('Model must be an object or an array');
   }
 
-  $types = ['textarea', 'text', 'email', 'number', 'password', 'file', 'date', 'time', 'datetime-local', 'search', 'tel', 'url','hidden'];
+  $types = ['textarea', 'text', 'email', 'number', 'password', 'file', 'date', 'time', 'datetime-local', 'search', 'tel', 'url', 'hidden'];
   if (!in_array($type, $types)) {
       throw new \Exception("Invalid input type: $type");
   }
@@ -68,82 +68,82 @@
   $classes = explode(' ', $attributes['class'] ?? '');
   $isFloatingLabel = in_array('floating-label', $classes);
 
-  if($error) {
-    $attributes = $attributes->merge(['class' => 'validator']);
+  if ($error) {
+      $attributes = $attributes->merge(['class' => 'validator']);
   }
 @endphp
 
 <div>
-@if($label && !$isFloatingLabel)
-  <p class="font-semibold text-xs mb-1">{{$label}}</p>
-@endif
+  @if ($label && !$isFloatingLabel)
+    <p class="font-semibold text-xs mb-1">{{ $label }}</p>
+  @endif
+  @if ($type === 'textarea')
+    <label {{ $attributes->merge(['class' => 'input textarea !h-full group w-full pb-0 pe-0   items-stretch'])->only('class') }}>
+      @if (isset($prefix) || isset($prefixIcon))
+        <label class="label !me-0 mb-2 self-stretch !h-auto">
+          @isset($prefixIcon)
+            <i class="{{ $prefixIcon }} self-start pt-1"></i>
+          @endisset
+          @isset($prefix)
+            {{ $prefix }}
+          @endisset
+        </label>
+      @endif
+      @if ($label && $isFloatingLabel)
+        <span>{{ $label }}</span>
+      @endif
 
-@if ($type === 'textarea')
-  <label {{ $attributes->merge(['class' => 'input textarea !h-full group w-full pb-0 pe-0   items-stretch'])->only('class') }}>  
-    @if(isset($prefix) || isset($prefixIcon))
-    <label class="label !me-0 mb-2 self-stretch !h-auto"> 
-        @isset($prefixIcon)
-        <i class="{{$prefixIcon}} self-start pt-1"></i>
-        @endisset
-        @isset($prefix)
-        {{$prefix}}
-        @endisset
-    </label>
-    @endif
-    @if($label && $isFloatingLabel)
-    <span>{{$label}}</span>
-    @endif   
-
-    <textarea id="{{ $id }}" name="{{ $name }}" class="w-full pb-2 pe-3"
-      placeholder="{{ $placeholder }}" {{ $attributes->except('class') }}>{{ $value }}</textarea>
-      @if(isset($suffix) || isset($suffixIcon))
-      <label class="label !mx-0 mb-2 self-stretch !h-auto"> 
+      <textarea id="{{ $id }}" name="{{ $name }}" class="w-full pb-2 pe-3" placeholder="{{ $placeholder }}"
+        {{ $attributes->except('class') }}>{{ $value }}</textarea>
+      @if (isset($suffix) || isset($suffixIcon))
+        <label class="label !mx-0 mb-2 self-stretch !h-auto">
           @isset($suffix)
-          {{$suffix}}
+            {{ $suffix }}
           @endisset
           @isset($suffixIcon)
-          <i class="{{$suffixIcon}} self-start pt-1"></i>
+            <i class="{{ $suffixIcon }} self-start pt-1"></i>
           @endisset
-      </label>
+        </label>
       @endif
-  </label>
-@else
-    
-  <label {{ $attributes->merge(['class' => 'input group w-full '. ($type =='hidden' ? 'hidden' : '')])->only('class') }}>  
-        @if(isset($prefix) || isset($prefixIcon))
-        <label class="label !me-0"> 
-            @isset($prefixIcon)
-            <i class="{{$prefixIcon}}"></i>
-            @endisset
-            @isset($prefix)
-            {{$prefix}}
-            @endisset
+    </label>
+  @else
+    <label {{ $attributes->merge(['class' => 'input group w-full ' . ($type == 'hidden' ? 'hidden' : '')])->only('class') }}
+      @if ($errors->has($name)) aria-invalid="true" @endif>
+      @if (isset($prefix) || isset($prefixIcon))
+        <label class="label !me-0">
+          @isset($prefixIcon)
+            <i class="{{ $prefixIcon }}"></i>
+          @endisset
+          @isset($prefix)
+            {{ $prefix }}
+          @endisset
         </label>
-        @endif
-        @if($label && $isFloatingLabel)
-            <span>{{$label}}</span>
-        @endif   
+      @endif
+      @if ($label && $isFloatingLabel)
+        <span>{{ $label }}</span>
+      @endif
       <input type="{{ $type }}" id="{{ $id }}" name="{{ $name }}" value="{{ $value }}"
-        placeholder="{{ $placeholder }}" {{ $attributes->except('class') }} />
-        @if(isset($suffix) || isset($suffixIcon))
-        <label class="label !ms-0"> 
-            @isset($suffix)
-            {{$suffix}}
-            @endisset
-            @isset($suffixIcon)
-            <i class="{{$suffixIcon}}"></i>
-            @endisset
+        placeholder="{{ $placeholder }}" {{ $attributes->except('class') }}
+        @if ($errors->has($name)) oninput="this.parentElement.removeAttribute('aria-invalid');this.reportValidity();" @endif />
+      @if (isset($suffix) || isset($suffixIcon))
+        <label class="label !ms-0">
+          @isset($suffix)
+            {{ $suffix }}
+          @endisset
+          @isset($suffixIcon)
+            <i class="{{ $suffixIcon }}"></i>
+          @endisset
         </label>
-        @endif
-  </label>
-@endif
+      @endif
+    </label>
+  @endif
 
-@if($error)
-  <div id="error-{{$id}}" class="validator-hint hidden mt-1">{{$error}}</div>
-@endif
+  @if ($error)
+    <div id="error-{{ $id }}" class="validator-hint hidden mt-1">{{ $error }}</div>
+  @endif
 
-@if($hint)
-  <p class="label text-xs mt-1 whitespace-normal">{{$hint}}</p>
-@endif
+  @if ($hint)
+    <p class="label text-xs mt-1 whitespace-normal">{{ $hint }}</p>
+  @endif
 
 </div>

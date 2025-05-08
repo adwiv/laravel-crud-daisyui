@@ -20,8 +20,8 @@ class StudentRequest extends FormRequest
         $ignoreId = $studentId ? ",$studentId,id" : '';
 
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'max:255', "unique:students,email{$ignoreId}"],
+            'name' => ['required', 'string', 'max:255' , 'min:3'],
+            'email' => ['required', 'email', 'max:255', "unique:students,email{$ignoreId}"],
             'phone' => ['required', 'string', 'max:10'],
             'date_of_birth' => ['required', 'date_format:Y-m-d'],
             'gender' => ['required', 'string', 'in:male,female'],

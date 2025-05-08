@@ -6,8 +6,9 @@
   <x-daisyui.breadcrumbs text="{{ pluralModelTitle }}" />
 </x-slot>
 
-<div class="card">
-    <div class="flex justify-between my-4">
+<div class="card card-border border-base-300 bg-base-100">
+    <div class="card-body p-6 gap-6">
+    <div class="flex justify-between">
         <div class="flex items-center gap-2">
             <form action="{{ route('{{ routeprefix }}.index') }}" method="GET" autocomplete="off">
                 <x-daisyui.input type="text" name="q" placeholder="Search {{ lcpluralModelTitle }}..." value="{{ request('q') }}" required>
@@ -22,13 +23,12 @@
                 </a>
             @endif
         </div>
-        <a class="btn btn-sm btn-primary" href="{{ route('{{ routeprefix }}.create') }}"><i class="fas fa-plus"></i> Add</a>
+        <a class="btn btn-primary" href="{{ route('{{ routeprefix }}.create') }}"><i class="fas fa-plus"></i> Add</a>
     </div>
-
-    <div class="card-body p-0">
-        <table class="table">
+    <div class=" overflow-x-auto border border-base-300  rounded">  
+        <table class="table table-hover">
             <thead>
-            <tr>
+            <tr class="bg-base-200/70">
                 {{ HEAD }}
                 <th>&nbsp;</th>
             </tr>
@@ -62,10 +62,19 @@
             </tbody>
         </table>
     </div>
-</div>
-{{-- // pagination --}}
-<div class="row justify-content-center">
-    {{ ${{ pluralModelVariable }}->links() }}
-</div>
 
+        {{-- // pagination --}}
+        <div class="row justify-content-center">
+            {{ ${{ pluralModelVariable }}->links() }}
+        </div>
+    </div>
+    </div>
+    @push('styles')
+        <style>
+            table.table-hover tr:hover {
+                background-color: #fafafa;
+            }
+        </style>
+    @endpush
+  
 </x-daisyui>
