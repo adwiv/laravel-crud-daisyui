@@ -143,8 +143,8 @@
       </aside>
     </div>
   </div>
-  @stack('scripts')
-  @yield('scripts')
+  @stack('js')
+  @yield('js')
 </body>
 
 </html>

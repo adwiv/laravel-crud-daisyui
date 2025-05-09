@@ -11,17 +11,34 @@ function slugify(text) {
     .replace(/-$/, ""); // Remove last floating dash if exists
 }
 
-$(document).ready(function () {
-  $(".slug-source").on("propertychange keyup input cut paste", function () {
-    const sinkId = this.dataset.slugSink;
-    const sink = document.getElementById(sinkId);
-    if (sink) sink.value = slugify($(this).val());
+document.addEventListener('DOMContentLoaded', function () {
+  const slugSources = document.querySelectorAll('.slug-source');
+  slugSources.forEach(source => {
+    ['propertychange', 'keyup', 'input', 'cut', 'paste'].forEach(eventType => {
+      source.addEventListener(eventType, function () {
+        const sinkId = this.dataset.slugSink;
+        const sink = document.getElementById(sinkId);
+        if (sink) sink.value = slugify(this.value);
+      });
+    });
   });
 });
 
 ///
 /// Handle form validation before submission
 ///
+function informInvalidForm() {
+  Swal.fire({
+    title: "Validation Error",
+    text: "Please fill in all the required fields correctly before submitting.",
+    icon: "warning",
+    confirmButtonColor: "#3085d6",
+    confirmButtonText: "OK",
+    allowOutsideClick: false,
+    allowEscapeKey: false
+  });
+}
+
 (function () {
   "use strict";
   window.addEventListener(
@@ -37,6 +54,7 @@ $(document).ready(function () {
             if (form.checkValidity() === false) {
               event.preventDefault();
               event.stopPropagation();
+              informInvalidForm();
             }
             form.classList.add("was-validated");
           },
@@ -104,6 +122,7 @@ document.addEventListener("click", (e) => {
     }
   }
 });
+
 
 // Handle browser navigation (back button, closing tab, etc.)
 // window.addEventListener("beforeunload", (e) => {
