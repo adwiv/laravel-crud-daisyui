@@ -11,7 +11,21 @@ production.
 
 ```shell
 composer require --dev adwiv/laravel-crud-daisyui
+npm i -D daisyui@latest
+npm i -D @sweetalert2
 ```
+
+add daisyui to resources/css/app.css
+```css
+@plugin daisyui;
+```
+
+update resources/js/app.js
+```js
+import Swal from 'sweetalert2';
+window.Swal = Swal;
+```
+
 
 #### Usage
 

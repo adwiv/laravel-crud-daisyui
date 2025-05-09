@@ -90,6 +90,7 @@
 
   $classes = explode(' ', $attributes['class'] ?? '');
   $isFloatingLabel = in_array('floating-label', $classes);
+
   if ($error) {
       $attributes = $attributes->merge(['class' => 'validator']);
   }
@@ -162,8 +163,8 @@
           $choiceId = $id . '.' . Str::slug($key, '-');
         @endphp
         <label class="label">
-          <input type="{{ $type === 'toggle' ? 'checkbox' : $type }}" name="{{ $name }}"
-            id="{{ $choiceId }}" {{ $attributes }} value="{{ $key }}"
+          <input type="{{ $type === 'toggle' ? 'checkbox' : $type }}" name="{{ $name }}" id="{{ $choiceId }}"
+            {{ $attributes }} value="{{ $key }}"
             @if ($selected) checked="checked" @endif>{{ $option }}</label>
       @endforeach
     </div>
