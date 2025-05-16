@@ -1,48 +1,48 @@
-<x-daisyui title="{{ model }} Details">
+<x-layouts.app title="{{ model }} Details">
+  <x-daisyui.panel>
+    <x-slot name="breadcrumbs">
+      <li><a href="{{ route('{{ homeroute }}') }}">Home</a></li>
+      <li><a href="{{ route('{{ routeprefix }}.index') }}">{{ pluralModelTitle }}</a></li>
+      <li>{{ ${{ modelVariable }}->{{ modelKey }} }}</a>
+    </x-slot>
 
-<x-slot name="breadcrumbs">
-    <x-daisyui.breadcrumbs text="Home" href="{{route('{{ homeroute }}')}}"/>
-    <x-daisyui.breadcrumbs text="{{ pluralModelTitle }}" href="{{route('{{ routeprefix }}.index')}}" />
-    <x-daisyui.breadcrumbs text="{{ ${{ modelVariable }}->name ?? ${{ modelVariable }}->id }}" />    
-</x-slot>
-
-<div class="card card-border border-base-300 bg-base-100">
-    <div class="card-body p-6 gap-6">
+    <div class="card card-border border-base-300 bg-base-100">
+      <div class="card-body p-6 gap-6">
         <div class="flex justify-end">
-            <a class="btn btn-primary btn-outline" href="{{route('{{ routeprefix }}.edit', ${{ modelVariable }})}}">Edit {{ model }}</a>
+          <a class="btn btn-primary btn-outline" href="{{route('{{ routeprefix }}.edit', ${{ modelVariable }})}}">Edit {{ model }}</a>
         </div>    
         <div class="overflow-x-auto border border-base-300  rounded">
-            <table class="table table-sm table-hover">
-                {{ FIELDS }}
-            </table>
+          <table class="table table-sm table-hover">
+            {{ FIELDS }}
+          </table>
         </div>
         <div class="flex justify-between items-center">   
-            <h3 class="font-semibold">Delete {{ model }}</h3>        
-            <form id="delete-form" action="{{route('{{ routeprefix }}.destroy', ${{ modelVariable }})}}" method="POST" >
-                @csrf
-                @method('DELETE')
-                <x-daisyui.button type="button" class="btn-outline"  color="error" onclick="confirmDelete()" label="Delete {{ model }}" />
-            </form>        
-            @section('plugins.Sweetalert2', true)
-            <script>
-                function confirmDelete() {
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You won't be able to revert this!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        console.log(result);
-                        if (result.isConfirmed) {
-                            document.getElementById('delete-form').submit();
-                        }
-                    })
+          <h3 class="font-semibold">Delete {{ model }}</h3>        
+          <form id="delete-form" action="{{route('{{ routeprefix }}.destroy', ${{ modelVariable }})}}" method="POST" >
+            @csrf
+            @method('DELETE')
+            <x-daisyui.button type="button" class="btn-outline"  color="error" onclick="confirmDelete()" label="Delete {{ model }}" />
+          </form>        
+          <script>
+            function confirmDelete() {
+              Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+              }).then((result) => {
+                console.log(result);
+                if (result.isConfirmed) {
+                  document.getElementById('delete-form').submit();
                 }
-            </script>
+              });
+            }
+          </script>
         </div>
+      </div>
     </div>
-</div>
-</x-daisyui>
+  </x-daisyui.panel>
+</x-layouts.app>

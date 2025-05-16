@@ -11,13 +11,18 @@ production.
 
 ```shell
 composer require --dev adwiv/laravel-crud-daisyui
-npm i -D daisyui@latest
-npm i -D @sweetalert2
+npm i -D daisyui@latest sweetalert2
 ```
 
 add daisyui to resources/css/app.css
 ```css
-@plugin daisyui;
+@plugin 'daisyui';
+
+@layer components {
+  .table-hover tr {
+    @apply hover:bg-gray-100 dark:hover:bg-gray-700;
+  }
+}
 ```
 
 update resources/js/app.js

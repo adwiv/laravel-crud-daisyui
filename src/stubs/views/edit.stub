@@ -1,50 +1,45 @@
+<x-layouts.app title="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}'}}">
+  <x-daisyui.panel>
+    <x-slot name="breadcrumbs">
+      <li><a href="{{ route('{{ homeroute }}') }}">Home</a></li>
+      <li><a href="{{ route('{{ routeprefix }}.index') }}">{{ pluralModelTitle }}</a></li>
 
-<x-daisyui title="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}'}}">
+      @isset(${{ modelVariable }})
+        <li><a href="{{ route('{{ routeprefix }}.show', ${{ modelVariable }}) }}">{{ ${{ modelVariable }}->{{ modelKey }} }}</a>
+        <li>Edit</li>
+      @else
+        <li>Create</li>
+      @endisset
+    </x-slot>
 
-<x-slot name="breadcrumbs">
-    <x-daisyui.breadcrumbs text="Home" href="{{ route('{{ homeroute }}') }}" />
-   <x-daisyui.breadcrumbs href="{{ route('{{ routeprefix }}.index') }}" text="{{ pluralModelTitle }}" />
+    <div class="card card-border border-base-300 bg-base-100">
+      <div class="card-body p-6 gap-5">
+        @if ($errors->any())
+          @foreach ($errors->all() as $error)
+            <x-daisyui.alert type="warning" :title="$error" />
+          @endforeach
+        @endif
 
-    @isset(${{ modelVariable }})
-        <x-daisyui.breadcrumbs href="{{ route('{{ routeprefix }}.show', ${{ modelVariable }}) }}" text="{{ ${{ modelVariable }}->name ?? ${{ modelVariable }}->id }}" />
-        <x-daisyui.breadcrumbs text="Edit" />
-    @else
-        <x-daisyui.breadcrumbs text="Create" />
-    @endisset
-</x-slot>
-
-
-<div class="card card-border border-base-300 bg-base-100">         
-        <div class="card-body p-6 gap-5">
-            @if ($errors->any())
-                @foreach ($errors->all() as $error)
-                    <x-daisyui.alert type="warning" :title="$error" />
-                @endforeach
-            @endif
-
-            <form id="crud-edit" method="post" class="needs-validation" novalidate autocomplete="off" action="{{ $action }}">
-                @if (${{ modelVariable }}) @method('PUT') @endif
-                @csrf
-                <x-daisyui.input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}" />
-                {{ FIELDS }}
-            </form>
-            <div class="flex justify-between">
-                    <div>         
-                        <a class="btn" href="{{ $referrer ?? route('{{ routeprefix }}.index') }}">&laquo; Back</a>           
-                        <x-daisyui.button type="reset" form="crud-edit" class="btn-outline" color="warning" label="Reset"/>             
-                    </div>
-                    <div>
-                        <x-daisyui.button type="submit" form="crud-edit" color="info" label="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}" />
-                    </div>       
-            </div>
+        <x-daisyui.form method="PUT" id="crud-edit" class="needs-validation" novalidate autocomplete="off" action="{{ $action }}">
+          <x-daisyui.input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}" />
+          {{ FIELDS }}
+        </x-daisyui.form>
+        
+        <div class="flex justify-between">
+          <div>
+            <a class="btn" href="{{ $referrer ?? route('{{ routeprefix }}.index') }}">&laquo; Back</a>
+            <x-daisyui.button type="reset" form="crud-edit" class="btn-outline" color="warning" label="Reset"/>
+          </div>
+          <div>
+            <x-daisyui.button type="submit" form="crud-edit" color="info" label="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}" />
+          </div>
         </div>
-</div>
+      </div>
+    </div>
 
-@push('js')
     <script src="{{ asset('js/crud-edit.js') }}"></script>
     <script>
-        trackFormModification("crud-edit");
+      trackFormModification("crud-edit");
     </script>
-@endpush
-
-</x-daisyui>
+  </x-daisyui.panel>
+</x-layouts.app>

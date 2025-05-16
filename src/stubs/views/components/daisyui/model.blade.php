@@ -6,6 +6,7 @@
       throw new \Exception('Model must be an object or an array');
   }
 @endphp
+
 <div {{ $attributes }}>
   {{ $slot }}
 </div>

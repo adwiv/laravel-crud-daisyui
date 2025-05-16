@@ -5,6 +5,7 @@ namespace Adwiv\Laravel\CrudGenerator\Console;
 use Adwiv\Laravel\CrudGenerator\CrudHelper;
 use BackedEnum;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -57,17 +58,21 @@ class ViewMakeCommand extends GeneratorCommand
     private function buildView($viewPrefix, $modelFullName)
     {
         $modelBaseName = class_basename($modelFullName);
-        $table = (new $modelFullName)->getTable();
+        /** @var Model $modelInstance */
+        $modelInstance = new $modelFullName();
+        $table = $modelInstance->getTable();
 
         // Get the resource type
         $this->resourceType = $this->getCrudControllerType($table);
 
         // Check if the model has a parent model
-        $parentBaseName = $parentFullName = $parentTable = null;
+        $parentBaseName = $parentFullName = $parentTable = $parentKeyName = null;
         if ($this->resourceType !== 'regular') {
             $parentFullName = $this->getCrudParentModel($table) or $this->fail("No parent model even though resource type is $this->resourceType");
             $parentBaseName = class_basename($parentFullName);
-            $parentTable = (new $parentFullName)->getTable();
+            $parentInstance = new $parentFullName();
+            $parentTable = $parentInstance->getTable();
+            $parentKeyName = Schema::hasColumn($parentTable, 'name') ? 'name' : $parentInstance->getKeyName();
         }
 
         // Get the route prefix
@@ -78,6 +83,7 @@ class ViewMakeCommand extends GeneratorCommand
         $parentRouteFullPrefix = implode('.', $routePrefixParts) . '.' . $parentRoutePrefix;
 
         $modelVariable = Str::singular($modelRoutePrefix);
+        $modelKeyName = Schema::hasColumn($table, 'name') ? 'name' : $modelInstance->getKeyName();
 
         $this->copyBladeFiles();
 
@@ -106,11 +112,13 @@ class ViewMakeCommand extends GeneratorCommand
                 '{{ parentrouteprefix }}' => $parentRouteFullPrefix,
                 '{{ nestedRouteParams }}' => $this->resourceType === 'nested' ? "[\$$parentModelVariable, \$$modelVariable]" : "\$$modelVariable",
                 '{{ model }}' => $modelBaseName,
+                '{{ modelKey }}' => $modelKeyName,
                 '{{ modelVariable }}' => $modelVariable,
                 '{{ pluralModelTitle }}' => Str::title(Str::snake(Str::pluralStudly($modelBaseName), ' ')),
                 '{{ lcpluralModelTitle }}' => Str::lower(Str::snake(Str::pluralStudly($modelBaseName), ' ')),
                 '{{ pluralModelVariable }}' => $modelRoutePrefix,
                 '{{ parentModel }}' => $parentBaseName ?? '',
+                '{{ parentModelKey }}' => $parentKeyName,
                 '{{ parentModelVariable }}' => $parentModelVariable,
                 '{{ pluralParentModelTitle }}' => $parentBaseName ? Str::title(Str::snake(Str::pluralStudly($parentBaseName), ' ')) : '',
                 '{{ pluralParentModelVariable }}' => $parentRoutePrefix ? $parentRoutePrefix : '',
@@ -140,8 +148,7 @@ class ViewMakeCommand extends GeneratorCommand
         // copy all view components
         $src = __DIR__ . '/../stubs/views/components';
         $dest = $this->laravel->resourcePath('views/components');
-        $this->copyDir("$src/crud/", "$dest/crud/");
-        $this->copyDir("$src/layouts/", "$dest/layouts/");
+        $this->copyDir("$src/daisyui/", "$dest/daisyui/");
         // copy all view scripts
         $src = __DIR__ . '/../stubs/views/js';
         $dest = $this->laravel->publicPath('js');
@@ -202,8 +209,9 @@ class ViewMakeCommand extends GeneratorCommand
             if ($foreignKey = $columnInfo->foreign) {
                 list($foreignTable, $foreignField) = preg_split('/,/', $foreignKey);
                 if ($foreignTable == $parentTable) continue; // Skip foreign keys that point to the parent table
-                $relation = Str::camel(Str::singular($foreignTable));
-                $fieldValue = "\${$modelVariable}->{$relation}->name ?? \${$modelVariable}->{$relation}->id";
+                $relation = Str::camel(Str::replaceEnd("_$foreignField", '', $field));
+                if ($columnInfo->isNullable()) $relation = $relation . "?";
+                $fieldValue = "\${$modelVariable}->{$relation}->name";
             }
 
             $HEAD .= "                    <th class=\"\">$fieldName</th>\n";
@@ -255,8 +263,9 @@ class ViewMakeCommand extends GeneratorCommand
             if ($foreignKey = $columnInfo->foreign) {
                 list($foreignTable, $foreignField) = preg_split('/,/', $foreignKey);
                 if ($foreignTable == $parentTable) continue; // Skip foreign keys that point to the parent table
-                $relation = Str::camel(Str::singular($foreignTable));
-                $fieldValue = "\${$modelVariable}->{$relation}->name ?? \${$modelVariable}->{$relation}->id";
+                $relation = Str::camel(Str::replaceEnd("_$foreignField", '', $field));
+                if ($columnInfo->isNullable()) $relation = $relation . "?";
+                $fieldValue = "\${$modelVariable}->{$relation}->name";
             }
 
             $FIELDS .= "
@@ -398,9 +407,9 @@ END;
         $FIELDS = trim($FIELDS);
 
         $FIELDS = <<<END
-        <x-crud.model class="flex flex-col gap-3" :model="\$$modelVariable">
+        <x-daisyui.model class="flex flex-col gap-3" :model="\$$modelVariable">
             $FIELDS
-        </x-crud.model>
+        </x-daisyui.model>
 
 END;
         return ['{{ FIELDS }}' => trim($FIELDS)];

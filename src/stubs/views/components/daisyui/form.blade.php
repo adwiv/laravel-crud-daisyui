@@ -8,7 +8,7 @@
       throw new \Exception("Invalid method: $method");
   }
 @endphp
-<form method="{{ $method == 'GET' ? 'GET' : 'POST' }}" {{ $attributes->merge(['class' => 'form']) }}>
+<form method="{{ $method == 'GET' ? 'GET' : 'POST' }}" {{ $attributes }}>
   @if ($method != 'GET')
     @csrf
     @if ($method != 'POST')

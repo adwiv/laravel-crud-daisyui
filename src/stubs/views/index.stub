@@ -1,80 +1,73 @@
-<x-daisyui title="{{ model }} List">
+<x-layouts.app title="{{ model }} List">
+  <x-daisyui.panel>
+    <!-- Breadcrumbs -->
+    <x-slot name="breadcrumbs">
+      <li><a href="{{ route('{{ homeroute }}') }}">Home</a></li>
+      <li>{{ pluralModelTitle }}</li>
+    </x-slot>
 
-<!-- Breadcrumbs -->
-<x-slot name="breadcrumbs">
-  <x-daisyui.breadcrumbs text="Home" href="{{ route('{{ homeroute }}') }}" />
-  <x-daisyui.breadcrumbs text="{{ pluralModelTitle }}" />
-</x-slot>
-
-<div class="card card-border border-base-300 bg-base-100">
-    <div class="card-body p-6 gap-6">
-    <div class="flex justify-between">
-        <div class="flex items-center gap-2">
-            <form action="{{ route('{{ routeprefix }}.index') }}" method="GET" autocomplete="off">
-                <x-daisyui.input type="text" name="q" placeholder="Search {{ lcpluralModelTitle }}..." value="{{ request('q') }}" required>
-                    <x-slot:suffix>
-                        <x-daisyui.button type="submit" icon="fas fa-search" class="btn-sm -me-2" />
-                    </x-slot>
-                </x-daisyui.input>
+    <div class="card card-border border-base-300 bg-base-100">
+      <div class="card-body p-6 gap-6">
+        <div class="flex justify-between">
+          <div class="flex items-center gap-2">
+            <form method="GET" action="{{ route('{{ routeprefix }}.index') }}" autocomplete="off">
+              <x-daisyui.input type="text" name="q" placeholder="Search {{ lcpluralModelTitle }}..." value="{{ request('q') }}" required>
+                <x-slot:suffix>
+                  <x-daisyui.button type="submit" icon="fas fa-search" class="btn-sm -me-2" />
+                </x-slot>
+              </x-daisyui.input>
             </form>
             @if (request('q'))
-                <a href="{{ route('{{ routeprefix }}.index') }}" class="btn btn-sm btn-primary btn-outline !text-md">
-                    {{ request('q') }} <i class="fas fa-square-xmark text-lg"></i>
-                </a>
+              <a href="{{ route('{{ routeprefix }}.index') }}" class="btn btn-sm btn-primary btn-outline !text-md">
+                {{ request('q') }} <i class="fas fa-square-xmark text-lg"></i>
+              </a>
             @endif
+          </div>
+          <a class="btn btn-primary" href="{{ route('{{ routeprefix }}.create') }}"><i class="fas fa-plus"></i> Add</a>
         </div>
-        <a class="btn btn-primary" href="{{ route('{{ routeprefix }}.create') }}"><i class="fas fa-plus"></i> Add</a>
-    </div>
-    <div class=" overflow-x-auto border border-base-300  rounded">  
+
+        <div class=" overflow-x-auto border border-base-300 rounded">  
         <table class="table table-hover">
-            <thead>
+          <thead>
             <tr class="bg-base-200/70">
-                {{ HEAD }}
-                <th>&nbsp;</th>
+              {{ HEAD }}
+              <th>&nbsp;</th>
             </tr>
-            </thead>
-            <tbody>
+          </thead>
+          <tbody>
             @forelse(${{ pluralModelVariable }} as ${{ modelVariable }})
             <tr>
-                {{ BODY }}
-                <td>
-                    <div class="flex gap-5">
-                        <div class="tooltip" data-tip="View">
-                            <a href="{{ route('{{ routeprefix }}.show', ${{ modelVariable }}) }}" 
-                                class="p-2 flex items-center text-base-content/70 hover:text-base-content">
-                                    <i class="fas fa-eye"></i>
-                            </a>
-                        </div>
-                        <div class="tooltip" data-tip="Edit">
-                            <a href="{{ route('{{ routeprefix }}.edit', ${{ modelVariable }}) }}" 
-                                class="p-2 flex items-center text-base-content/70 hover:text-base-content">
-                                    <i class="fas fa-edit"></i>
-                            </a>
-                        </div>
+              {{ BODY }}
+              <td>
+                <div class="flex gap-5">
+                  <div class="tooltip" data-tip="View">
+                    <a href="{{ route('{{ routeprefix }}.show', ${{ modelVariable }}) }}" 
+                       class="p-2 flex items-center text-base-content/70 hover:text-base-content">
+                      <i class="fas fa-eye"></i>
+                    </a>
                     </div>
-                </td>
+                    <div class="tooltip" data-tip="Edit">
+                    <a href="{{ route('{{ routeprefix }}.edit', ${{ modelVariable }}) }}" 
+                       class="p-2 flex items-center text-base-content/70 hover:text-base-content">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                  </div>
+                </div>
+              </td>
             </tr>
             @empty
-                <tr>
-                    {{ EMPTY }}
-                </tr>
+            <tr>
+              {{ EMPTY }}
+            </tr>
             @endforelse
-            </tbody>
+          </tbody>
         </table>
-    </div>
+      </div>
 
-        {{-- // pagination --}}
-        <div class="row justify-content-center">
-            {{ ${{ pluralModelVariable }}->links() }}
-        </div>
+      {{-- // pagination --}}
+      <div class="row justify-content-center">
+        {{ ${{ pluralModelVariable }}->links() }}
+      </div>
     </div>
-    </div>
-    @push('styles')
-        <style>
-            table.table-hover tr:hover {
-                background-color: #fafafa;
-            }
-        </style>
-    @endpush
-  
-</x-daisyui>
+  </x-daisyui.panel>
+</x-layouts.app>
