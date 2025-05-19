@@ -33,7 +33,7 @@
         </div>
         @endif
 
-        <form id="crud-edit" method="post" class="needs-validation" novalidate autocomplete="off" action="{{ $action }}">
+        <form id="crud-edit" method="post" autocomplete="off" action="{{ $action }}">
             @if (${{ modelVariable }}) @method('PUT') @endif
             @csrf
             <input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}">
@@ -53,12 +53,4 @@
         </div>
     </div>
 </div>
-
-@push('js')
-    <script src="{{ asset('js/crud-edit.js') }}"></script>
-    <script>
-        trackFormModification("crud-edit");
-    </script>
-@endpush
-
 </x-layouts.crud>

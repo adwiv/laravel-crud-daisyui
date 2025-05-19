@@ -13,7 +13,7 @@ class {{ class }} extends Model
 {
     use HasFactory{{ TRAITS }};
     {{ TABLE }}
-    protected $guarded = ['id'];
+    protected $fillable = [{{ FILLABLE }}];
 
     {{ CASTS }}
 

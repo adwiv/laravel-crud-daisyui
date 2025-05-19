@@ -151,7 +151,7 @@ class ViewMakeCommand extends GeneratorCommand
         $this->copyDir("$src/daisyui/", "$dest/daisyui/");
         // copy all view scripts
         $src = __DIR__ . '/../stubs/views/js';
-        $dest = $this->laravel->publicPath('js');
+        $dest = $this->laravel->resourcePath('js');
         $this->copyDir("$src/", "$dest/");
     }
 
@@ -308,11 +308,7 @@ class ViewMakeCommand extends GeneratorCommand
 
             if ($castType === 'boolean') {
                 $FIELDS .= <<<END
-
-             
-
-                <x-daisyui.choices type="select" id="$field" label="$fieldName" name="$field" :options="['FALSE','TRUE']"{$required}/>
-
+                <x-daisyui.select label="$fieldName" name="$field" :options="['FALSE','TRUE']"{$required}/>
 END;
             } else if ($columnInfo->type == 'enum' || $columnInfo->type == 'set') {
                 $type = $columnInfo->type == 'set' ? 'checkbox' : 'radio';
@@ -327,11 +323,7 @@ END;
 
                 if ($isBackedEnum) {
                     $FIELDS .= <<<END
-
-              
-
-                <x-daisyui.choices type="$type" id="$field" label="$fieldName" name="$choiceName"{$required} :options="$enumClass::array()"/>
-
+                <x-daisyui.$type label="$fieldName" name="$choiceName"{$required} :options="$enumClass::array()"/>
 END;
                 } else {
                     $options = [];
@@ -342,13 +334,11 @@ END;
                     $options = implode(",", $options);
 
                     $FIELDS .= <<<END
-
                 @php
                     \$$pluralFieldVar = [$options];
                 @endphp
                
-                <x-daisyui.choices type="$type" id="$field"  label="$fieldName" name="$choiceName"{$required} :options="\$$pluralFieldVar"/>
-
+                <x-daisyui.$type label="$fieldName" name="$choiceName"{$required} :options="\$$pluralFieldVar"/>
 END;
                 }
             } else if ($foreignKey = $columnInfo->foreign) {
@@ -358,23 +348,17 @@ END;
                 $valueKey = $foreignField !== 'id' ? " valueKey=\"$foreignField\"" : '';
 
                 $FIELDS .= <<<END
-
-              
-                <x-daisyui.choices type="select" id="$field" label="$fieldName" name="$field" :options="$foreignClass::all()"{$valueKey}{$required}/>
-
+                <x-daisyui.select label="$fieldName" name="$field" :options="$foreignClass::all()"{$valueKey}{$required}/>
 END;
             } else if (
                 $formInputType == 'textarea' ||
                 ($formInputType == 'string' && $columnInfo->length > 255)
             ) {
                 $FIELDS .= <<<END
-
-            
-
-                <x-daisyui.textarea id="$field" label="$fieldName" name="$field" rows="5"{$required}/>
+                <x-daisyui.textarea label="$fieldName" name="$field" rows="5"{$required}/>
 END;
             } else {
-                $type = 'type="text"';
+                $type = '';
                 if ($formInputType == 'date') $type = 'type="date"';
                 if ($formInputType == 'time') $type = 'type="time"';
                 if ($formInputType == 'datetime') $type = 'type="datetime-local" step="1"';
@@ -395,23 +379,14 @@ END;
                 if (in_array($lcFieldVar, ['url', 'link']) || Str::endsWith($lcFieldVar, ['_url', '_link'])) $type = 'type="url"';
 
                 $FIELDS .= <<<END
-
-              
-
-                <x-daisyui.input $type id="$field" label="$fieldName" name="$field"{$required}/>
-
+                <x-daisyui.input $type label="$fieldName" name="$field"{$required}/>
 END;
             }
+            $FIELDS .= "\n\n";
         }
 
         $FIELDS = trim($FIELDS);
 
-        $FIELDS = <<<END
-        <x-daisyui.model class="flex flex-col gap-3" :model="\$$modelVariable">
-            $FIELDS
-        </x-daisyui.model>
-
-END;
         return ['{{ FIELDS }}' => trim($FIELDS)];
     }
 }

@@ -16,8 +16,7 @@
             {{ FIELDS }}
           </table>
         </div>
-        <div class="flex justify-between items-center">   
-          <h3 class="font-semibold">Delete {{ model }}</h3>        
+        <div class="flex justify-end">
           <form id="delete-form" action="{{route('{{ routeprefix }}.destroy', ${{ modelVariable }})}}" method="POST" >
             @csrf
             @method('DELETE')

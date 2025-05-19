@@ -31,7 +31,7 @@ class {{ class }} extends Controller
 
     public function store({{ requestModel }} $request)
     {
-        $referrer = $request->get('_referrer');
+        $referrer = $request->input('_referrer');
         $redirectTo = $referrer ?: route('{{ routeprefix }}.index');
 
         $fields = $request->validated();
@@ -57,14 +57,18 @@ class {{ class }} extends Controller
         $fields = $request->validated();
         ${{ modelVariable }}->update($fields);
 
-        $referrer = $request->get('_referrer');
+        $referrer = $request->input('_referrer');
         $redirectTo = $referrer ?: route('{{ routeprefix }}.index');
         return redirect($redirectTo)->with('success', '{{ model }} updated successfully');
     }
 
     public function destroy({{ model }} ${{ modelVariable }})
     {
-        ${{ modelVariable }}->delete();
+        try {
+            ${{ modelVariable }}->delete();
+        } catch (\Exception $e) {
+            return redirect()->route('{{ viewprefix }}.index')->with('error', '{{ model }} cannot be deleted');
+        }
 
         return redirect()->route('{{ routeprefix }}.index')->with('success', '{{ model }} deleted successfully');
     }

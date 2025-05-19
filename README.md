@@ -19,9 +19,18 @@ add daisyui to resources/css/app.css
 @plugin 'daisyui';
 
 @layer components {
-  .table-hover tr {
-    @apply hover:bg-gray-100 dark:hover:bg-gray-700;
-  }
+    .table-hover tr {
+        @apply hover:bg-base-300;
+    }
+
+    .select select:not([multiple]) {
+        color: color-mix(in oklch, currentColor 50%, #0000);
+    }
+
+    .select select:has(option:checked:not([value])),
+    .select select:has(option:checked:not([value=""])) {
+        color: currentColor;
+    }
 }
 ```
 

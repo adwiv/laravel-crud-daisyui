@@ -21,7 +21,7 @@
       throw new \Exception('Model must be an object or an array');
   }
 
-  $types = ['textarea', 'text', 'email', 'number', 'password', 'file', 'date', 'time', 'datetime-local', 'search', 'tel', 'url', 'hidden'];
+  $types = ['textarea', 'text', 'email', 'number', 'password', 'date', 'time', 'datetime-local', 'search', 'tel', 'url', 'hidden'];
   if (!in_array($type, $types)) {
       throw new \Exception("Invalid input type: $type");
   }
@@ -68,17 +68,20 @@
   $classes = explode(' ', $attributes['class'] ?? '');
   $isFloatingLabel = in_array('floating-label', $classes);
 
-  if ($error) {
-      $attributes = $attributes->merge(['class' => 'validator']);
+  $isRequired = $attributes->has('required');
+  $labelIndicator = $isRequired ? ' <span class="text-error">*</span>' : '';
+
+  if ($isRequired || $error) {
+      $attributes = $attributes->merge(['class' => 'invalid-validator']);
   }
 @endphp
 
 <div>
   @if ($label && !$isFloatingLabel)
-    <p class="mb-1 text-xs font-semibold">{{ $label }}</p>
+    <p class="mb-1 text-xs font-semibold">{{ $label }}{!! $labelIndicator !!}</p>
   @endif
   @if ($type === 'textarea')
-    <label {{ $attributes->merge(['class' => 'input textarea !h-full group w-full pb-0 pe-0   items-stretch'])->only('class') }}>
+    <label id="label-{{ $id }}" {{ $attributes->merge(['class' => 'input textarea !h-full group w-full pb-0 pe-0 items-stretch'])->only('class') }}>
       @if (isset($prefix) || isset($prefixIcon))
         <label class="label !me-0 mb-2 !h-auto self-stretch">
           @isset($prefixIcon)
@@ -90,7 +93,7 @@
         </label>
       @endif
       @if ($label && $isFloatingLabel)
-        <span>{{ $label }}</span>
+        <span>{{ $label }}{!! $labelIndicator !!}</span>
       @endif
 
       <textarea id="{{ $id }}" name="{{ $name }}" class="w-full pb-2 pe-3" placeholder="{{ $placeholder }}" {{ $attributes->except('class') }}>{{ $value }}</textarea>
@@ -106,7 +109,7 @@
       @endif
     </label>
   @else
-    <label {{ $attributes->merge(['class' => 'input group w-full ' . ($type == 'hidden' ? 'hidden' : '')])->only('class') }}
+    <label id="label-{{ $id }}" {{ $attributes->merge(['class' => 'input group w-full ' . ($type == 'hidden' ? 'hidden' : '')])->only('class') }}
       @if ($errors->has($name)) aria-invalid="true" @endif>
       @if (isset($prefix) || isset($prefixIcon))
         <label class="label !me-0">
@@ -119,7 +122,7 @@
         </label>
       @endif
       @if ($label && $isFloatingLabel)
-        <span>{{ $label }}</span>
+        <span>{{ $label }}{!! $labelIndicator !!}</span>
       @endif
       <input type="{{ $type }}" id="{{ $id }}" name="{{ $name }}" value="{{ $value }}" placeholder="{{ $placeholder }}"
         {{ $attributes->except('class') }}
@@ -138,7 +141,9 @@
   @endif
 
   @if ($error)
-    <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{{ $error }}</div>
+    <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{!! $error !!}</div>
+  @elseif ($isRequired)
+    <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{{ $label }} is required.</div>
   @endif
 
   @if ($hint)

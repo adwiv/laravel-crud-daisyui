@@ -36,7 +36,8 @@ class ColumnInfo
             $this->length = 0;
         }
         if ($this->type == 'enum' || $this->type == 'set') {
-            $this->values = self::getEnumValues($this->type, $column['type']);
+            if (!preg_match("/^{$this->type}\((.*)\)$/", $column['type'], $matches)) die("Invalid {$this->type} value");
+            $this->values = str_getcsv($matches[1], ',', "'");
         }
     }
 
@@ -68,12 +69,6 @@ class ColumnInfo
         }
     }
 
-    private static function getEnumValues($type, $fullType): array
-    {
-        if (!preg_match("/^$type\((.*)\)$/", $fullType, $matches)) die("Invalid $type value");
-        return str_getcsv($matches[1], ',', "'");
-    }
-
     public function validationType()
     {
         switch ($this->type) {
@@ -95,6 +90,8 @@ class ColumnInfo
             case 'text':
             case 'guid':
                 return 'string';
+            case 'char':
+                return $this->length == 36 ? 'uuid' : ($this->length == 26 ? 'ulid' : 'string');
             case 'tinyint':
             case 'boolean':
                 return 'boolean';
@@ -242,14 +239,31 @@ class ColumnInfo
     public static function getReferencingKeys($refTable)
     {
         $keys = [];
+        $schema = "";
+
+        $db = config('database.default');
+        if ($db == 'mysql') {
+            $schema = config('database.connections.mysql.database');
+        } else if ($db == 'pgsql') {
+            $schema = config('database.connections.pgsql.database');
+        } else if ($db == 'mariadb') {
+            $schema = config('database.connections.mariadb.database');
+        } else if ($db == 'sqlsrv') {
+            $schema = config('database.connections.sqlsrv.database');
+        }
+        echo "Schema: $schema\n";
         foreach (Schema::getTables() as $table) {
-            $columns = null;
-            foreach (Schema::getForeignKeys($table['name']) as $foreignKey) {
-                if (!$columns) $columns = self::fromTable($table['name']);
+            if ($schema != $table['schema']) continue;
+
+            $tableName = $table['name'];
+            $columns = self::fromTable($tableName);
+            $foreignKeys = Schema::getForeignKeys($tableName);
+
+            foreach ($foreignKeys as $foreignKey) {
                 if ($foreignKey['foreign_table'] == $refTable) {
                     if (count($foreignKey['columns']) == 1) {
                         $key = [
-                            'table' => $table['name'],
+                            'table' => $tableName,
                             'key' => $foreignKey['columns'][0],
                             'ref' => $foreignKey['foreign_columns'][0],
                         ];
