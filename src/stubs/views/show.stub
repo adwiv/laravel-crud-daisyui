@@ -9,15 +9,14 @@
     <div class="card card-border border-base-300 bg-base-100">
       <div class="card-body p-6 gap-6">
         <div class="flex justify-end">
-          <a class="btn btn-primary btn-outline" href="{{route('{{ routeprefix }}.edit', ${{ modelVariable }})}}">Edit {{ model }}</a>
-        </div>    
+          <x-daisyui.link-btn href="{{route('{{ routeprefix }}.edit', ${{ modelVariable }})}}" icon="fas fa-edit" label="Edit"/>
+        </div>
         <div class="overflow-x-auto border border-base-300  rounded">
           <table class="table table-sm table-hover">
             {{ FIELDS }}
           </table>
         </div>
-        <div class="flex justify-between items-center">   
-          <h3 class="font-semibold">Delete {{ model }}</h3>        
+        <div class="flex justify-end">
           <form id="delete-form" action="{{route('{{ routeprefix }}.destroy', ${{ modelVariable }})}}" method="POST" >
             @csrf
             @method('DELETE')

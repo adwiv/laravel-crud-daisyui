@@ -89,14 +89,17 @@
   $classes = explode(' ', $attributes['class'] ?? '');
   $isFloatingLabel = in_array('floating-label', $classes);
 
-  if ($error) {
-      $attributes = $attributes->merge(['class' => 'validator']);
+  $isRequired = $attributes->has('required');
+  $labelIndicator = $isRequired ? ' <span class="text-error">*</span>' : '';
+
+  if ($isRequired || $error) {
+      $attributes = $attributes->merge(['class' => 'invalid-validator']);
   }
 @endphp
 
 <div>
   @if ($label && !$isFloatingLabel)
-    <p class="mb-1 text-xs font-semibold">{{ $label }}</p>
+    <p class="mb-1 text-xs font-semibold">{{ $label }}{!! $labelIndicator !!}</p>
   @endif
   @if ($type === 'select')
     @php
@@ -121,9 +124,19 @@
               break;
           }
       }
+
+      $placeholderAttributes = [];
+      if ($isRequired) {
+          $placeholderAttributes[] = 'disabled';
+      }
+      if ($noOptionSelected) {
+          $placeholderAttributes[] = 'selected';
+      }
+      $placeholderAttributes = implode(' ', $placeholderAttributes);
+
     @endphp
 
-    <label {{ $attributes->only('class') }}>
+    <label {{ $attributes->only('class') }} @if ($errors->has($name)) aria-invalid="true" @endif>
       @if (isset($prefix) || isset($prefixIcon))
         <label class="label {{ $labelClass }}">
           @isset($prefixIcon)
@@ -136,13 +149,13 @@
       @endif
 
       @if ($label && $isFloatingLabel)
-        <span>{{ $label }}</span>
+        <span>{{ $label }}{!! $labelIndicator !!}</span>
       @endif
 
-      <select id="{{ $id }}" name="{{ $name }}" class="!p-2" {{ $attributes->except('class') }}>
+      <select id="{{ $id }}" name="{{ $name }}" class="w-full !ps-3" {{ $attributes->except('class') }}
+        @if ($errors->has($name)) onchange="this.parentElement.removeAttribute('aria-invalid');this.reportValidity();" @endif>
         @if ($placeholder)
-          <option value="" @if ($attributes->has('required')) disabled="disabled" @endif @if ($noOptionSelected) selected="selected" @endif>
-            {{ $placeholder }}</option>
+          <option value="" {{ $placeholderAttributes }}>{{ $placeholder }}</option>
         @endif
         @foreach ($options as $key => $option)
           @php
@@ -160,7 +173,7 @@
           $selected = in_array("$key", $value);
           $choiceId = $id . '.' . Str::slug($key, '-');
         @endphp
-        <label class="label">
+        <label class="label text-current">
           <input type="{{ $type === 'toggle' ? 'checkbox' : $type }}" name="{{ $name }}" id="{{ $choiceId }}" {{ $attributes }}
             value="{{ $key }}" @if ($selected) checked="checked" @endif>{{ $option }}</label>
       @endforeach
@@ -168,7 +181,9 @@
   @endif
 
   @if ($error)
-    <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{{ $error }}</div>
+    <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{!! $error !!}</div>
+  @elseif ($isRequired)
+    <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{{ $label }} is required.</div>
   @endif
 
   @if ($hint)

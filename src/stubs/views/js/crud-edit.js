@@ -1,5 +1,4 @@
 /// crud-edit.js 1.0.0
-
 ///
 /// Handle slug updation
 ///
@@ -11,105 +10,166 @@ function slugify(text) {
     .replace(/-$/, ""); // Remove last floating dash if exists
 }
 
-$(document).ready(function () {
-  $(".slug-source").on("propertychange keyup input cut paste", function () {
-    const sinkId = this.dataset.slugSink;
-    const sink = document.getElementById(sinkId);
-    if (sink) sink.value = slugify($(this).val());
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.slug-source').forEach(source => {
+    ['propertychange', 'keyup', 'input', 'cut', 'paste'].forEach(eventType => {
+      source.addEventListener(eventType, () => {
+        const sinkId = source.dataset.slugSink;
+        const sink = document.getElementById(sinkId);
+        if (sink) sink.value = slugify(source.value);
+      });
+    });
   });
 });
 
-///
-/// Handle form validation before submission
-///
+/**
+ * CRUD Form Protection Script
+ * Monitors form changes and provides confirmation dialogs for unsaved changes
+ * Requires: SweetAlert2
+ */
+
 (function () {
-  "use strict";
-  window.addEventListener(
-    "load",
-    function () {
-      // Fetch all the forms we want to apply custom Bootstrap validation styles to
-      let forms = document.getElementsByClassName("needs-validation");
-      // Loop over them and prevent submission
-      let validation = Array.prototype.filter.call(forms, function (form) {
-        form.addEventListener(
-          "submit",
-          function (event) {
-            if (form.checkValidity() === false) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
-            form.classList.add("was-validated");
-          },
-          false
-        );
+  'use strict';
+
+  // Get the main form
+  const form = document.querySelector('form#crud-edit');
+
+  let isResetting = false;
+  let isNavigatingAway = false;
+
+  function isFormModified() {
+    if (!form) return false;
+    const inputs = form.querySelectorAll('input, textarea, select');
+    return Array.from(inputs).some(input => {
+      if (input.type === 'checkbox' || input.type === 'radio') {
+        return input.checked !== input.defaultChecked;
+      }
+      if (input.tagName === 'SELECT') {
+        const options = Array.from(input.options);
+        return options.some(option => option.selected !== option.defaultSelected);
+      }
+      return input.value !== input.defaultValue;
+    });
+  }
+
+  // Handle reset button click
+  function handleFormReset(event) {
+    if (isResetting) return;
+
+    if (isFormModified()) {
+      event.preventDefault();
+
+      Swal.fire(confirmReset).then((result) => {
+        if (result.isConfirmed) {
+          isResetting = true;
+          form.reset();
+          isResetting = false;
+        }
       });
-    },
-    false
-  );
-})();
-
-///
-/// Handle navigation with unsaved changes
-///
-
-// Initialize variables
-let formModified = false;
-
-function trackFormModification(formName) {
-  let form = document.getElementById(formName);
-  if (!form) console.error(`Form not found: ${formName}`);
-  form?.addEventListener("input", (e) => {
-    formModified = true;
-  });
-  form?.addEventListener("reset", (e) => {
-    formModified = false;
-  });
-  form?.addEventListener("submit", (e) => {
-    formModified = false;
-  });
-}
-
-// Function to handle navigation with confirmation
-async function handleNavigation(url) {
-  if (!formModified) {
-    window.location.href = url;
-    return;
-  }
-
-  const result = await Swal.fire({
-    title: "Unsaved Changes",
-    text: "You have unsaved changes. Are you sure you want to leave this page?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, leave page",
-    cancelButtonText: "Stay on page",
-    allowOutsideClick: false, // Prevent clicking outside to dismiss
-    allowEscapeKey: false, // Prevent ESC key from dismissing
-  });
-
-  if (result.isConfirmed) {
-    window.location.href = url;
-  }
-}
-
-// Handle clicks on links
-document.addEventListener("click", (e) => {
-  if (formModified) {
-    const link = e.target.closest("a");
-    if (link && link.href) {
-      e.preventDefault();
-      handleNavigation(link.href);
     }
   }
-});
 
-// Handle browser navigation (back button, closing tab, etc.)
-// window.addEventListener("beforeunload", (e) => {
-//   if (formModified) {
-//     e.preventDefault();
-//     e.returnValue = ""; // Required for browser compatibility
-//     return e.returnValue;
-//   }
-// });
+  // Handle link clicks (navigating away)
+  function handleLinkClick(event) {
+    const link = event.target.closest('a');
+    if (!link) return;
+
+    // Skip if link opens in new window/tab
+    if (link.target || link.getAttribute('rel') === 'noopener') {
+      return;
+    }
+
+    // Skip if it's the back button or other specific links you want to ignore
+    // You can customize this logic based on your needs
+    const href = link.getAttribute('href');
+    if (!href || href === '#' || href.startsWith('javascript:')) {
+      return;
+    }
+
+    // Skip if form is not modified or if we're submitting
+    if (!isFormModified() || isNavigatingAway) {
+      return;
+    }
+
+    event.preventDefault();
+
+    Swal.fire(confirmLeave).then((result) => {
+      if (result.isConfirmed) {
+        isNavigatingAway = true;
+        window.location.href = href;
+      }
+    });
+  }
+
+  // Handle browser back/forward/close
+  function handleBeforeUnload(event) {
+    if (isFormModified() && !isNavigatingAway) {
+      event.preventDefault();
+      // Modern browsers ignore custom messages, but we still need to set returnValue
+      event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+      return event.returnValue;
+    }
+  }
+
+  // Handle form submission
+  function handleFormSubmit(event) {
+    isNavigatingAway = true;
+    setTimeout(() => {
+      // If the form submission was prevented by another handler, reset the submitting flag
+      if (event.defaultPrevented) {
+        isNavigatingAway = false;
+      }
+    }, 0);
+  }
+
+  // Initialize the script
+  function init() {
+    if (!form) {
+      console.warn('No form with id="crud-edit" found. Skipping form protection.');
+      return;
+    }
+
+    form.addEventListener('reset', handleFormReset);
+    form.addEventListener('submit', handleFormSubmit);
+    document.addEventListener('click', handleLinkClick);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Cleanup function (optional - for SPA scenarios)
+  window.crudFormProtectionCleanup = function () {
+    form.removeEventListener('submit', handleFormSubmit);
+    document.removeEventListener('click', handleLinkClick);
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+    console.log('CRUD Form Protection cleaned up');
+  };
+
+  const confirmReset = {
+    title: 'Reset Form?',
+    text: 'Are you sure you want to reset the form? All unsaved changes will be lost.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, reset it!',
+    cancelButtonText: 'Cancel'
+  };
+
+  const confirmLeave = {
+    title: 'Unsaved Changes',
+    text: 'You have unsaved changes. Are you sure you want to leave this page?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, leave page',
+    cancelButtonText: 'Stay on page'
+  };
+
+})();

@@ -31,6 +31,8 @@ class ModelMakeCommand extends GeneratorCommand
 
     protected function buildClass($name)
     {
+        $fillable = [];
+
         $force = $this->option('force');
         $this->copyFile('CsvArray.php', __DIR__ . '/../stubs/casts', $this->laravel->path . '/Casts');
 
@@ -90,6 +92,8 @@ class ModelMakeCommand extends GeneratorCommand
                 }
             }
             if (in_array($field, ['id', 'uid', 'uuid', 'remember_token', 'deleted_at', 'updated_at', 'created_at'])) continue;
+
+            $fillable[] = $field;
 
             // Begin:: Generate casts for the model
             $enumName = $this->getEnum($table, $field) ?? Str::studly(Str::singular($field));
@@ -160,20 +164,25 @@ class ModelMakeCommand extends GeneratorCommand
             $localKey = $relation['ref'];
             $oneOrMany = $relation['unique'] ? 'hasOne' : 'hasMany';
             $oneOrManyClass = $relation['unique'] ? 'HasOne' : 'HasMany';
+            // echo "FT:{$foreignTable}, FK:{$foreignKey}, LK:{$localKey}, ON:{$oneOrMany}, OOC:{$oneOrManyClass}\n";
             $localTableRef = Str::lower(Str::replaceEnd("_$localKey", '', $foreignKey));
-            $localTableName = Str::plural($localTableRef);
+            $localClasssRef = Str::studly($localTableRef);
             $relationClass = $this->getModelForTable($foreignTable);
             $relationBaseClass = class_basename($relationClass);
+            // echo "T:{$table} LTR:{$localTableRef}, RCL:{$relationClass}, RBC:{$relationBaseClass}\n";
 
-            $relationName = $relation['unique'] ? Str::singular($foreignTable) : $foreignTable;
-            if ($localTableName !== $table) {
+            $relationName = Str::snake($relation['unique'] ? $relationBaseClass : Str::pluralStudly($relationBaseClass));
+            // echo "RN:{$relationName}\n";
+            if ($localClasssRef !== $modelBaseName) {
                 $relationName = "{$localTableRef}_{$relationName}";
+                // echo "RN2:{$relationName}\n";
             } else if (Str::startsWith($relationName, "{$localTableRef}_")) {
                 $relationName = Str::replaceFirst("{$localTableRef}_", '', $relationName);
+                // echo "RN3:{$relationName}\n";
             }
             $relationName = Str::camel($relationName);
-
-            $this->debug("$foreignTable, $foreignKey, $localKey, $localTableRef, $localTableName, $relationName");
+            // echo "RN4:{$relationName}\n";
+            $this->debug("$foreignTable, $foreignKey, $localKey, $localTableRef, $relationName");
 
             $IMPORTS[] = "use $relationClass;";
             $oneOrManyFullClass = 'Illuminate\Database\Eloquent\Relations\\' . $oneOrManyClass . ';';
@@ -199,10 +208,15 @@ class ModelMakeCommand extends GeneratorCommand
 ") . PHP_EOL;
         }
 
+        $FILLABLE = "";
+        if (!empty($fillable)) {
+            $FILLABLE = "'" . implode("', '", $fillable) . "'";
+        }
         $replace = [
             '{{ namespacedModel }}' => $modelFullName,
             '{{ model }}' => $modelBaseName,
             '{{ BELONGS }}' => trim($BELONGS),
+            '{{ FILLABLE }}' => $FILLABLE,
             '{{ CASTS }}' => trim($CASTS),
             '{{ IMPORTS }}' => implode("\n", array_unique($IMPORTS)),
             '{{ UNIQUES }}' => trim($UNIQUES),

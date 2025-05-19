@@ -1,66 +1,66 @@
-<x-layouts.crud>
+<x-layouts.app title="{{ model }} List">
+  <x-daisyui.panel>
+    <!-- Breadcrumbs -->
+    <x-slot name="breadcrumbs">
+      <li><a href="{{ route('{{ homeroute }}') }}">Home</a></li>
+      <li><a href="{{ route('{{ parentrouteprefix }}.index')}}">{{ pluralParentModelTitle }}</a></li>
+      <li><a href="{{ route('{{ parentrouteprefix }}.show', ${{ parentModelVariable }})}}">{{ ${{ parentModelVariable }}->name  }}</a></li>
+      <li>{{ pluralModelTitle }}</li>
+    </x-slot>
 
-<x-slot:title>{{ model }} List</x-slot>
-
-<x-slot:breadcrumbs>
-    <li class="breadcrumb-item"><a href="{{route('{{ homeroute }}')}}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{route('{{ parentrouteprefix }}.index')}}">{{ pluralParentModelTitle }}</a></li>
-    <li class="breadcrumb-item"><a href="{{route('{{ parentrouteprefix }}.show', ${{ parentModelVariable }})}}">{{ ${{ parentModelVariable }}->name ?? ${{ parentModelVariable }}->id }}</a></li>
-    <li class="breadcrumb-item active">{{ pluralModelTitle }}</li>
-</x-slot>
-
-<div class="card">
-    <div class="card-header">
-        <div class="card-title">
-            <form action="{{ route('{{ routeprefix }}.index', ${{ parentModelVariable }}) }}" method="GET" class="form-inline input-group input-group-sm" autocomplete="off">
-                <input type="text" name="q" class="form-control" placeholder="Search {{ lcpluralModelTitle }}..." value="{{ request('q') }}" required>
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
+    <div class="card card-border border-base-300 bg-base-100">
+      <div class="card-body p-6 gap-6">
+        <div class="flex justify-between">
+          <div class="flex items-center gap-2">
+            <form method="GET" action="{{ route('{{ routeprefix }}.index', ${{ parentModelVariable }}) }}" autocomplete="off">
+              <x-daisyui.input type="text" name="q" placeholder="Search {{ lcpluralModelTitle }}..." value="{{ request('q') }}" required>
+                <x-slot:suffix>
+                  <x-daisyui.button type="submit" icon="fas fa-search" class="btn-sm -mx-2 shadow-none" />
+                </x-slot>
+              </x-daisyui.input>
             </form>
+            @if (request('q'))
+              <a href="{{ route('{{ routeprefix }}.index', ${{ parentModelVariable }}) }}" class="btn btn-sm btn-primary btn-outline !text-md">
+                {{ request('q') }} <i class="fas fa-square-xmark text-lg"></i>
+              </a>
+            @endif
+          </div>
+          <x-daisyui.link-btn href="{{ route('{{ routeprefix }}.create', ${{ parentModelVariable }}) }}" icon="fas fa-plus" label="Add" />
         </div>
-        @if(request('q'))
-        <span class="card-title ml-3">
-            <a href="{{route('{{ routeprefix }}.index')}}" class="badge-pill btn btn-sm btn-primary">{{ request('q') }} <span class="ml-1 badge badge-sm badge-light badge-pill"><i class="fas fa-times"></i></span></a>
-        </span>
-        @endif
-        <div class="card-tools mr-0">
-            <a class="btn btn-sm btn-outline-primary" href="{{route('{{ routeprefix }}.create', ${{ parentModelVariable }})}}">Add {{ model }}</a>
-        </div>
-    </div>
-    <div class="card-body p-0">
-        <table class="table table-sm table-hover">
-            <thead class="text-sm">
-            <tr>
-                {{ HEAD }}
-                <th>&nbsp;</th>
+
+        <div class=" overflow-x-auto border border-base-300 rounded">  
+        <table class="table table-hover">
+          <thead>
+            <tr class="bg-base-200/70">
+              {{ HEAD }}
+              <th>&nbsp;</th>
             </tr>
-            </thead>
-            <tbody class="text-sm">
+          </thead>
+          <tbody>
             @forelse(${{ pluralModelVariable }} as ${{ modelVariable }})
             <tr>
-                {{ BODY }}
-                <td>
-                    <div class="d-flex justify-content-end">
-                        <a href="{{ route('{{ shallowrouteprefix }}.show', {{ nestedRouteParams }}) }}" class="text-primary text-center pl-3"><i class="fas fa-eye"></i> View</a>
-                        <a href="{{ route('{{ shallowrouteprefix }}.edit', {{ nestedRouteParams }}) }}" class="text-primary text-center pl-3"><i class="fas fa-edit"></i> Edit</a>
-                    </div>
-                </td>
+              {{ BODY }}
+              <td>
+                <div class="flex gap-5">
+                  <x-daisyui.link-icon href="{{ route('{{ shallowrouteprefix }}.show', ${{ nestedRouteParams }}) }}" icon="fas fa-eye" tooltip="View" />
+
+                  <x-daisyui.link-icon href="{{ route('{{ shallowrouteprefix }}.edit', ${{ nestedRouteParams }}) }}" icon="fas fa-edit" tooltip="Edit" />
+                </div>
+              </td>
             </tr>
             @empty
-                <tr>
-                    {{ EMPTY }}
-                </tr>
+            <tr>
+              {{ EMPTY }}
+            </tr>
             @endforelse
-            </tbody>
+          </tbody>
         </table>
-    </div>
-</div>
-{{-- // pagination --}}
-<div class="row justify-content-center">
-    {{ ${{ pluralModelVariable }}->links('pagination::bootstrap-4') }}
-</div>
+      </div>
 
-</x-layouts.crud>
+      {{-- // pagination --}}
+      <div class="row justify-content-center">
+        {{ ${{ pluralModelVariable }}->links() }}
+      </div>
+    </div>
+  </x-daisyui.panel>
+</x-layouts.app>

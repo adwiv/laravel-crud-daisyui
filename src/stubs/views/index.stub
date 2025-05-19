@@ -13,7 +13,7 @@
             <form method="GET" action="{{ route('{{ routeprefix }}.index') }}" autocomplete="off">
               <x-daisyui.input type="text" name="q" placeholder="Search {{ lcpluralModelTitle }}..." value="{{ request('q') }}" required>
                 <x-slot:suffix>
-                  <x-daisyui.button type="submit" icon="fas fa-search" class="btn-sm -me-2" />
+                  <x-daisyui.button type="submit" icon="fas fa-search" class="btn-sm -mx-2 shadow-none" />
                 </x-slot>
               </x-daisyui.input>
             </form>
@@ -23,7 +23,7 @@
               </a>
             @endif
           </div>
-          <a class="btn btn-primary" href="{{ route('{{ routeprefix }}.create') }}"><i class="fas fa-plus"></i> Add</a>
+          <x-daisyui.link-btn href="{{ route('{{ routeprefix }}.create') }}" icon="fas fa-plus" label="Add" />
         </div>
 
         <div class=" overflow-x-auto border border-base-300 rounded">  
@@ -40,18 +40,9 @@
               {{ BODY }}
               <td>
                 <div class="flex gap-5">
-                  <div class="tooltip" data-tip="View">
-                    <a href="{{ route('{{ routeprefix }}.show', ${{ modelVariable }}) }}" 
-                       class="p-2 flex items-center text-base-content/70 hover:text-base-content">
-                      <i class="fas fa-eye"></i>
-                    </a>
-                    </div>
-                    <div class="tooltip" data-tip="Edit">
-                    <a href="{{ route('{{ routeprefix }}.edit', ${{ modelVariable }}) }}" 
-                       class="p-2 flex items-center text-base-content/70 hover:text-base-content">
-                      <i class="fas fa-edit"></i>
-                    </a>
-                  </div>
+                  <x-daisyui.link-icon href="{{ route('{{ routeprefix }}.show', ${{ modelVariable }}) }}" icon="fas fa-eye" tooltip="View" />
+
+                  <x-daisyui.link-icon href="{{ route('{{ routeprefix }}.edit', ${{ modelVariable }}) }}" icon="fas fa-edit" tooltip="Edit" />
                 </div>
               </td>
             </tr>

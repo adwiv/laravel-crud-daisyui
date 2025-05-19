@@ -36,7 +36,7 @@ class {{ class }} extends Controller
         $fields = $request->validated();
         ${{ parentModelVariable }}->{{ pluralModelVariable }}()->create($fields);
 
-        $referrer = $request->get('_referrer');
+        $referrer = $request->input('_referrer');
         $redirectTo = $referrer ?: route('{{ routeprefix }}.index', ${{ parentModelVariable }});
         return redirect($redirectTo)->with('success', '{{ model }} created successfully');
     }
@@ -60,15 +60,21 @@ class {{ class }} extends Controller
         $fields = $request->validated();
         ${{ modelVariable }}->update($fields);
 
-        $referrer = $request->get('_referrer');
-        $redirectTo = $referrer ?: route('{{ routeprefix }}.index');
+        $referrer = $request->input('_referrer');
+        $redirectTo = $referrer ?: route('{{ routeprefix }}.index', ${{ modelVariable }}->{{ parentModelVariable }});
         return redirect($redirectTo)->with('success', '{{ model }} updated successfully');
     }
 
     public function destroy({{ model }} ${{ modelVariable }})
     {
-        ${{ modelVariable }}->delete();
+        $redirectTo = route('{{ routeprefix }}.index', ${{ modelVariable }}->{{ parentModelVariable }});
 
-        return redirect()->route('{{ routeprefix }}.index')->with('success', '{{ model }} deleted successfully');
+        try {
+            ${{ modelVariable }}->delete();
+        } catch (\Exception $e) {
+            return redirect($redirectTo)->with('error', '{{ model }} cannot be deleted');
+        }
+
+        return redirect($redirectTo)->with('success', '{{ model }} created successfully');
     }
 }

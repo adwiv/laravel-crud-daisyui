@@ -14,7 +14,7 @@ class {{ class }} extends Authenticatable
 {
     use HasFactory, Notifiable{{ TRAITS }};
     {{ TABLE }}
-    protected $guarded = ['id', 'password', 'remember_token'];
+    protected $fillable = [{{ FILLABLE }}];
 
     {{ CASTS }}
 

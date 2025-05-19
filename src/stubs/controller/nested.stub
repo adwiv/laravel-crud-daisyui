@@ -8,6 +8,7 @@ use {{ namespacedModel }};
 use {{ namespacedParentModel }};
 use {{ rootNamespace }}Http\Controllers\Controller;
 use {{ requestFullModel }};
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class {{ class }} extends Controller
@@ -36,7 +37,7 @@ class {{ class }} extends Controller
         $fields = $request->validated();
         ${{ parentModelVariable }}->{{ pluralModelVariable }}()->create($fields);
 
-        $referrer = $request->get('_referrer');
+        $referrer = $request->input('_referrer');
         $redirectTo = $referrer ?: route('{{ routeprefix }}.index', ${{ parentModelVariable }});
         return redirect($redirectTo)->with('success', '{{ model }} created successfully');
     }
@@ -65,7 +66,7 @@ class {{ class }} extends Controller
         $fields = $request->validated();
         ${{ modelVariable }}->update($fields);
 
-        $referrer = $request->get('_referrer');
+        $referrer = $request->input('_referrer');
         $redirectTo = $referrer ?: route('{{ routeprefix }}.index', ${{ parentModelVariable }});
         return redirect($redirectTo)->with('success', '{{ model }} updated successfully');
     }
@@ -74,7 +75,11 @@ class {{ class }} extends Controller
     {
         $this->validateParentModel(${{ parentModelVariable }}, ${{ modelVariable }});
 
-        ${{ modelVariable }}->delete();
+        try {
+            ${{ modelVariable }}->delete();
+        } catch (\Exception $e) {
+            return redirect()->route('{{ viewprefix }}.index', ${{ parentModelVariable }})->with('error', '{{ model }} cannot be deleted');
+        }
 
         return redirect()->route('{{ routeprefix }}.index', ${{ parentModelVariable }})->with('success', '{{ model }} deleted successfully');
     }

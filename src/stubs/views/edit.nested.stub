@@ -1,64 +1,47 @@
-<x-layouts.crud>
+<x-layouts.app title="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}'}}">
+  <x-daisyui.panel>
+    <x-slot name="breadcrumbs">
+      <li><a href="{{ route('{{ homeroute }}') }}">Home</a></li>
+      <li><a href="{{ route('{{ parentrouteprefix }}.index') }}">{{ pluralParentModelTitle }}</a></li>
+      <li><a href="{{ route('{{ parentrouteprefix }}.show', ${{ parentModelVariable }}) }}">{{ ${{ parentModelVariable }}->name  }}</a></li>
+      <li><a href="{{ route('{{ routeprefix }}.index', ${{ parentModelVariable }}) }}">{{ pluralModelTitle }}</a></li>
 
-<x-slot name="title">{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}</x-slot>
+      @isset(${{ modelVariable }})
+        <li><a href="{{ route('{{ shallowrouteprefix }}.show', {{ nestedRouteParams }}) }}">{{ ${{ modelVariable }}->{{ modelKey }} }}</a></li>
+        <li>Edit</li>
+      @else
+        <li>Create</li>
+      @endisset
+    </x-slot>
 
-<x-slot name="breadcrumbs">
-    <li class="breadcrumb-item"><a href="{{route('{{ homeroute }}')}}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{route('{{ parentrouteprefix }}.index')}}">{{ pluralParentModelTitle }}</a></li>
-    <li class="breadcrumb-item"><a href="{{route('{{ parentrouteprefix }}.show', ${{ parentModelVariable }})}}">{{ ${{ parentModelVariable }}->name ?? ${{ parentModelVariable }}->id }}</a></li>
-    <li class="breadcrumb-item"><a href="{{route('{{ routeprefix }}.index', ${{ parentModelVariable }})}}">{{ pluralModelTitle }}</a></li>
-    @isset(${{ modelVariable }})
-        <li class="breadcrumb-item"><a href="{{route('{{ shallowrouteprefix }}.show', {{ nestedRouteParams }})}}">{{ ${{ modelVariable }}->name ?? ${{ modelVariable }}->id }}</a></li>
-        <li class="breadcrumb-item active">Edit</li>
-    @else
-        <li class="breadcrumb-item active">Create</li>
-    @endisset
-</x-slot>
-
-<div class="card">
-    <div class="card-header">
-        <div class="card-title text-lg">{{ ${{ modelVariable }} ? 'Edit {{ model }}' : 'Create {{ model }}' }}</div>
-        <div class="card-tools mr-0">
-            <button type="reset" form="crud-edit" class="btn btn-sm btn-outline-warning">Reset</button>
-        </div>
-    </div>
-    <div class="card-body">
+    <div class="card card-border border-base-300 bg-base-100">
+      <div class="card-body p-6 gap-5">
         @if ($errors->any())
-        <div class="alert alert-warning">
-            <ul class="py-0 my-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+          @foreach ($errors->all() as $error)
+            <x-daisyui.alert type="warning" :title="$error" />
+          @endforeach
         @endif
 
-        <form id="crud-edit" method="post" class="needs-validation" novalidate autocomplete="off" action="{{ $action }}">
-            @if (${{ modelVariable }}) @method('PUT') @endif
-            @csrf
-            <input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}">
+        <x-daisyui.form id="crud-edit" method="{{ ${{ modelVariable }} ? 'PUT' : 'POST'}}" action="{{ $action }}" autocomplete="off">
+          <input type="hidden" name="_referrer" value="{{ old('_referrer', $referrer) }}" />
+
+          <x-daisyui.model class="flex flex-col gap-3" :model="${{ modelVariable }}">
+
             {{ FIELDS }}
-        </form>
-    </div>
-    <div class="card-footer">
-        <div class="row">
-            <div class="col-sm-4">
-                <a class="btn btn-link pl-0" href="{{ $referrer ?? route('{{ routeprefix }}.index') }}">&laquo; Back</a>
-            </div>
-            <div class="col-sm-4 text-center">
-            </div>
-            <div class="col-sm-4 text-right">
-                <button type="submit" form="crud-edit" class="btn btn-info">{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}</button>
-            </div>
+
+          </x-daisyui.model>
+        </x-daisyui.form>
+        
+        <div class="flex justify-between">
+          <div>
+            <a class="btn" href="{{ $referrer ?? route('{{ routeprefix }}.index', ${{ parentModelVariable }}) }}">&laquo; Back</a>
+            <x-daisyui.button type="reset" form="crud-edit" class="btn-outline" color="warning" label="Reset"/>
+          </div>
+          <div>
+            <x-daisyui.button type="submit" form="crud-edit" color="info" label="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}' }}" />
+          </div>
         </div>
+      </div>
     </div>
-</div>
-
-@push('js')
-    <script src="{{ asset('js/crud-edit.js') }}"></script>
-    <script>
-        trackFormModification("crud-edit");
-    </script>
-@endpush
-
-</x-layouts.crud>
+  </x-daisyui.panel>
+</x-layouts.app>
