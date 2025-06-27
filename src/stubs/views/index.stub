@@ -31,7 +31,7 @@
           <thead>
             <tr class="bg-base-200/70">
               {{ HEAD }}
-              <th>&nbsp;</th>
+              <th width="10">&nbsp;</th>
             </tr>
           </thead>
           <tbody>
