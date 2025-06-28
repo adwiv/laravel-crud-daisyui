@@ -72,6 +72,7 @@ class ColumnInfo
     public function validationType()
     {
         switch ($this->type) {
+            case 'int':
             case 'year':
             case 'smallint':
             case 'integer':

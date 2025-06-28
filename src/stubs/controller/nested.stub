@@ -78,7 +78,7 @@ class {{ class }} extends Controller
         try {
             ${{ modelVariable }}->delete();
         } catch (\Exception $e) {
-            return redirect()->route('{{ viewprefix }}.index', ${{ parentModelVariable }})->with('error', '{{ model }} cannot be deleted');
+            return redirect()->back()->with('error', 'Could not delete {{ model }}');
         }
 
         return redirect()->route('{{ routeprefix }}.index', ${{ parentModelVariable }})->with('success', '{{ model }} deleted successfully');
