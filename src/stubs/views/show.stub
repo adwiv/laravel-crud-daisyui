@@ -3,7 +3,7 @@
     <x-slot name="breadcrumbs">
       <li><a href="{{ route('{{ homeroute }}') }}">Home</a></li>
       <li><a href="{{ route('{{ routeprefix }}.index') }}">{{ pluralModelTitle }}</a></li>
-      <li>{{ ${{ modelVariable }}->{{ modelKey }} }}</a>
+      <li>{{ ${{ modelVariable }}->{{ modelKey }} }}</li>
     </x-slot>
 
     <div class="card card-border border-base-300 bg-base-100">
