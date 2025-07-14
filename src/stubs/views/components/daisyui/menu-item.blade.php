@@ -9,11 +9,11 @@
 @php
   $currentUrl = url()->current();
   $url = $route ? route($route) : url($href);
-  $isActive = ($active && request()->is($active)) || $currentUrl === $url;
+  $isActive = $active && request()->is($active);
 @endphp
 
-<li class="mb-2">
-  <a href="{{ $url }}" @class(['menu-active' => $isActive])>
+<li {{ $attributes }}>
+  <a href="{{ $url }}" @class(['w-full', 'menu-active' => $isActive])>
     @if ($icon)
       <i class="{{ $icon }} w-5"></i>
     @endif

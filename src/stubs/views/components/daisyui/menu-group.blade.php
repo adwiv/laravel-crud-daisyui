@@ -11,7 +11,7 @@
   }
 @endphp
 
-<li>
+<li {{ $attributes }}>
   <details {{ $hasActiveChild ? 'open' : '' }}>
     <summary>
       @if ($icon)
@@ -19,7 +19,7 @@
       @endif
       {{ $text }}
     </summary>
-    <ul>
+    <ul class="menu gap-2">
       {{ $slot }}
     </ul>
   </details>

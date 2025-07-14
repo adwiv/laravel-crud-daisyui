@@ -7,6 +7,7 @@
 @php
   // Valid button classes: 'btn-neutral', 'btn-primary', 'btn-secondary', 'btn-accent',
   // 'btn-error', 'btn-warning', 'btn-success', 'btn-info'
+  // 'btn-xl', 'btn-lg', 'btn-md', 'btn-sm', 'btn-xs'
   $validColors = ['neutral', 'primary', 'secondary', 'accent', 'error', 'warning', 'success', 'info'];
   if (!in_array($color, $validColors)) {
       throw new \Exception("Invalid color: $color. Valid colors are: " . implode(', ', $validColors));

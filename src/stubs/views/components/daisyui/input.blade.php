@@ -1,12 +1,13 @@
 @props([
-    'id',
     'name',
+    'id' => null,
     'label' => null,
     'type' => 'text',
     'placeholder' => null,
     'value' => null,
     'model' => null,
     'modelKey' => null,
+    'default' => null,
     'oldKey' => null,
     'prefixIcon' => null,
     'suffixIcon' => null,
@@ -15,13 +16,13 @@
     'hint' => null,
     'error' => null,
 ])
-@aware(['id', 'model' => null])
+@aware(['model' => null])
 @php
   if ($model && !is_object($model) && !is_array($model)) {
       throw new \Exception('Model must be an object or an array');
   }
 
-  $types = ['textarea', 'text', 'email', 'number', 'password', 'date', 'time', 'datetime-local', 'search', 'tel', 'url', 'hidden'];
+  $types = ['textarea', 'text', 'email', 'number', 'password', 'date', 'time', 'datetime-local', 'search', 'tel', 'url'];
   if (!in_array($type, $types)) {
       throw new \Exception("Invalid input type: $type");
   }
@@ -62,18 +63,25 @@
       $attributes = $attributes->merge(['data-old-key' => $oldKey]);
   }
 
+  // If value is not set, set it to default
+  $value ??= $default;
+
   $id ??= Str::slug($name);
   $placeholder ??= $label ? "Enter $label" : '';
 
   $classes = explode(' ', $attributes['class'] ?? '');
   $isFloatingLabel = in_array('floating-label', $classes);
 
-  $isRequired = $attributes->has('required');
+  $isRequired = $attributes->get('required') ?: false;
+  $isRequired = $attributes->get('disabled') ? false : $isRequired;
   $labelIndicator = $isRequired ? ' <span class="text-error">*</span>' : '';
 
-  if ($isRequired || $error) {
-      $attributes = $attributes->merge(['class' => 'invalid-validator']);
-  }
+  $attributes = $attributes->merge(['class' => 'input-validator']);
+
+  $fieldName = strtolower(Str::headline($label ?? $name));
+  $error ??= "Please enter a valid {$fieldName}.";
+
+  $canHavePlaceholder = in_array($type, ['text', 'email', 'password', 'number', 'tel', 'url', 'search', 'textarea']);
 @endphp
 
 <div>
@@ -81,7 +89,7 @@
     <p class="mb-1 text-xs font-semibold">{{ $label }}{!! $labelIndicator !!}</p>
   @endif
   @if ($type === 'textarea')
-    <label id="label-{{ $id }}" {{ $attributes->merge(['class' => 'input textarea !h-full group w-full pb-0 pe-0 items-stretch'])->only('class') }}>
+    <label id="label-{{ $id }}" {{ $attributes->merge(['class' => 'input textarea !h-full w-full pb-0 pe-0 items-stretch'])->only('class') }}>
       @if (isset($prefix) || isset($prefixIcon))
         <label class="label !me-0 mb-2 !h-auto self-stretch">
           @isset($prefixIcon)
@@ -109,7 +117,7 @@
       @endif
     </label>
   @else
-    <label id="label-{{ $id }}" {{ $attributes->merge(['class' => 'input group w-full ' . ($type == 'hidden' ? 'hidden' : '')])->only('class') }}
+    <label id="label-{{ $id }}" {{ $attributes->merge(['class' => 'input w-full'])->only('class') }}
       @if ($errors->has($name)) aria-invalid="true" @endif>
       @if (isset($prefix) || isset($prefixIcon))
         <label class="label !me-0">
@@ -124,9 +132,9 @@
       @if ($label && $isFloatingLabel)
         <span>{{ $label }}{!! $labelIndicator !!}</span>
       @endif
-      <input type="{{ $type }}" id="{{ $id }}" name="{{ $name }}" value="{{ $value }}" placeholder="{{ $placeholder }}"
-        {{ $attributes->except('class') }}
-        @if ($errors->has($name)) oninput="this.parentElement.removeAttribute('aria-invalid');this.reportValidity();" @endif />
+      <input type="{{ $type }}" id="{{ $id }}" name="{{ $name }}" value="{{ $value }}" {{ $attributes->except('class') }}
+        @if ($canHavePlaceholder) placeholder="{{ $placeholder }}" @endif
+        @if ($errors->has($name)) oninput="this.parentElement.removeAttribute('aria-invalid');this.reportValidity();" @endif>
       @if (isset($suffix) || isset($suffixIcon))
         <label class="label !ms-0">
           @isset($suffix)
@@ -140,11 +148,7 @@
     </label>
   @endif
 
-  @if ($error)
-    <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{!! $error !!}</div>
-  @elseif ($isRequired)
-    <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{{ $label }} is required.</div>
-  @endif
+  <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{!! $error !!}</div>
 
   @if ($hint)
     <p class="label mt-1 whitespace-normal text-xs">{{ $hint }}</p>

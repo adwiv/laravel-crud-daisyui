@@ -1,7 +1,7 @@
 @props([
-    'id',
-    'label',
     'name',
+    'id' => null,
+    'label' => null,
     'type' => null,
     'placeholder' => null,
     'value' => null,
@@ -17,7 +17,7 @@
     'hint' => null,
     'error' => null,
 ])
-@aware(['id', 'label', 'model' => null])
+@aware(['model' => null])
 @php
   if (!in_array($type, ['radio', 'checkbox', 'toggle', 'select'])) {
       throw new \Exception("Invalid choices type: $type");
@@ -46,6 +46,7 @@
       })
       ->toArray();
 
+  $id ??= Str::slug($name);
   $oldKey ??= preg_replace('@\[([^]]+)\]@', '.$1', preg_replace('@\[\]$@', '', $name));
 
   // Get value from model if available
@@ -89,12 +90,14 @@
   $classes = explode(' ', $attributes['class'] ?? '');
   $isFloatingLabel = in_array('floating-label', $classes);
 
-  $isRequired = $attributes->has('required');
+  $isRequired = $attributes->get('required') ? true : false;
+  $isRequired = $attributes->get('disabled') ? false : $isRequired;
   $labelIndicator = $isRequired ? ' <span class="text-error">*</span>' : '';
 
-  if ($isRequired || $error) {
-      $attributes = $attributes->merge(['class' => 'invalid-validator']);
-  }
+  $attributes = $attributes->merge(['class' => 'input-validator']);
+
+  $fieldName = strtolower(Str::headline($label ?? $name));
+  $error ??= "Please enter a valid {$fieldName}.";
 @endphp
 
 <div>
@@ -113,9 +116,13 @@
           $attributes = $attributes->merge(['class' => 'w-full']);
       }
 
+      if (isset($prefix) || isset($prefixIcon)) {
+          $attributes = $attributes->merge(['class' => 'ps-3']);
+      }
+
       // If placeholder is null, set it to default
       // pass emtpy string as placeholder to disable placeholder
-      $placeholder ??= "Select $label";
+      $placeholder ??= 'Select ' . ($label ?? $name);
 
       $noOptionSelected = true;
       foreach ($options as $key => $option) {
@@ -161,13 +168,13 @@
           @php
             $selected = in_array("$key", $value);
           @endphp
-          <option value="{{ $key }}" {{ $selected ? 'selected="selected"' : '' }}>{{ $option }}
+          <option value="{{ $key }}" @if ($selected) selected="selected" @endif>{{ $option }}
           </option>
         @endforeach
       </select>
     </label>
   @else
-    <div class="flex flex-wrap gap-3">
+    <div class="flex flex-wrap gap-3 p-1.5">
       @foreach ($options as $key => $option)
         @php
           $selected = in_array("$key", $value);
@@ -182,8 +189,6 @@
 
   @if ($error)
     <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{!! $error !!}</div>
-  @elseif ($isRequired)
-    <div id="error-{{ $id }}" class="validator-hint mt-1 hidden">{{ $label }} is required.</div>
   @endif
 
   @if ($hint)

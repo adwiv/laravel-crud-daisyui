@@ -1,6 +1,7 @@
 @props([
     'type' => null,
     'icon' => null,
+    'emoji' => null,
     'title' => null,
     'subtitle' => null,
     'vertical' => false,
@@ -25,31 +26,36 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => $classes]) }} role="alert">
-  <span>
-    @if ($icon === 'success')
-      <i class="fas fa-circle-check"></i>
-    @elseif($icon === 'error')
-      <i class="fas fa-circle-xmark"></i>
-    @elseif($icon === 'warning')
-      <i class="fas fa-triangle-exclamation"></i>
-    @elseif($icon === 'info')
-      <i class="fas fa-circle-info"></i>
-    @elseif($icon !== null && $icon !== 'none')
-      <i class="fas fa-{{ $icon }}"></i>
-    @endif
-  </span>
+  @if ($emoji)
+    <span class="text-xl">{{ $emoji }}</span>
+  @elseif ($icon !== null && $icon !== 'none')
+    <span>
+      @if ($icon === 'success')
+        <i class="fas fa-circle-check"></i>
+      @elseif($icon === 'error')
+        <i class="fas fa-circle-xmark"></i>
+      @elseif($icon === 'warning')
+        <i class="fas fa-triangle-exclamation"></i>
+      @elseif($icon === 'info')
+        <i class="fas fa-circle-info"></i>
+      @else
+        <i class="fas fa-{{ $icon }}"></i>
+      @endif
+    </span>
+  @endif
 
   @if ($subtitle)
     <div>
-      <h3 class="font-bold">{{ $title }}</h3>
-      <div class="text-xs">{{ $subtitle }}</div>
+      <h3 class="font-bold">{!! $title !!}</h3>
+      <div class="text-sm">{!! $subtitle !!}</div>
     </div>
   @else
-    <span>{{ $title }}</span>
+    <div>{!! $title !!}</div>
   @endif
 
   @if ($dismissable)
-    <button class="btn btn-sm btn-error btn-ghost btn-circle transition-transform duration-300 hover:rotate-90" onclick="return this.parentNode.remove();">
+    <button class="btn btn-sm btn-{{ $type }} btn-ghost btn-circle transition-transform duration-300 hover:rotate-90"
+      onclick="return this.parentNode.remove();">
       <i class="fa-solid fa-xmark"></i>
     </button>
   @endif
