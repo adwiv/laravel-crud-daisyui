@@ -1,26 +1,4 @@
-/// crud-edit.js 1.0.0
-///
-/// Handle slug updation
-///
-function slugify(text) {
-  text = text.toString().toLowerCase().trim();
-  return text
-    .replace(/&/g, "-and-") // Replace & with 'and'
-    .replace(/[\s\W-]+/g, "-") // Replace spaces, non-word characters and dashes with a single dash (-)
-    .replace(/-$/, ""); // Remove last floating dash if exists
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.slug-source').forEach(source => {
-    ['propertychange', 'keyup', 'input', 'cut', 'paste'].forEach(eventType => {
-      source.addEventListener(eventType, () => {
-        const sinkId = source.dataset.slugSink;
-        const sink = document.getElementById(sinkId);
-        if (sink) sink.value = slugify(source.value);
-      });
-    });
-  });
-});
+/// crud-edit.js 2.0.0
 
 /**
  * CRUD Form Protection Script
@@ -125,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize the script
   function init() {
     if (!form) {
-      console.warn('No form with id="crud-edit" found. Skipping form protection.');
       return;
     }
 

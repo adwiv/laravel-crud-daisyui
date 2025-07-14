@@ -34,7 +34,6 @@ class ModelMakeCommand extends GeneratorCommand
         $fillable = [];
 
         $force = $this->option('force');
-        $this->copyFile('CsvArray.php', __DIR__ . '/../stubs/casts', $this->laravel->path . '/Casts');
 
         $modelFullName = $this->qualifyModel($name);
         $modelBaseName = class_basename($modelFullName);
@@ -43,8 +42,16 @@ class ModelMakeCommand extends GeneratorCommand
         $table = $this->getCrudTable($name, false);
         $defaultTable = Str::snake(Str::pluralStudly($modelBaseName));
 
+        // Check if the table has set columns
+        $setColumns = ColumnInfo::getSetColumns($table);
+        if (!empty($setColumns)) {
+            $this->copyFile('CsvArray.php', __DIR__ . '/../stubs/casts', $this->laravel->path . '/Casts');
+        }
+
+        // Check if the table has enum columns
         // Begin:: Generate Enums for the model
         $enumColumns = ColumnInfo::getEnumColumns($table);
+
         foreach ($enumColumns as $column) {
             $enumFieldName = $column->name;
             $values = $column->values;

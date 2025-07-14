@@ -1,4 +1,4 @@
-<x-layouts.app title="{{ model }} List">
+<x-layouts.admin title="{{ model }} List">
   <x-daisyui.panel>
     <!-- Breadcrumbs -->
     <x-slot name="breadcrumbs">
@@ -64,4 +64,4 @@
       </div>
     </div>
   </x-daisyui.panel>
-</x-layouts.app>
+</x-layouts.admin>

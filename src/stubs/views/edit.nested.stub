@@ -1,4 +1,4 @@
-<x-layouts.app title="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}'}}">
+<x-layouts.admin title="{{ ${{ modelVariable }} ? 'Update {{ model }}' : 'Create {{ model }}'}}">
   <x-daisyui.panel>
     <x-slot name="breadcrumbs">
       <li><a href="{{ route('{{ homeroute }}') }}">Home</a></li>
@@ -44,4 +44,4 @@
       </div>
     </div>
   </x-daisyui.panel>
-</x-layouts.app>
+</x-layouts.admin>

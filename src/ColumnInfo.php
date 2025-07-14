@@ -206,6 +206,12 @@ class ColumnInfo
         return $columns;
     }
 
+    public static function getSetColumns(string $table): array
+    {
+        $columns = self::fromTable($table);
+        return array_filter($columns, fn($column) => $column->type === 'set');
+    }
+
     public static function getEnumColumns(string $table): array
     {
         $columns = self::fromTable($table);
