@@ -149,6 +149,8 @@ class ViewMakeCommand extends GeneratorCommand
         $src = __DIR__ . '/../stubs/views/components';
         $dest = $this->laravel->resourcePath('views/components');
         $this->copyDir("$src/daisyui/", "$dest/daisyui/");
+        $this->copyDir("$src/layouts/", "$dest/layouts/");
+
         // copy all view scripts
         $src = __DIR__ . '/../stubs/views/js';
         $dest = $this->laravel->resourcePath('js');
