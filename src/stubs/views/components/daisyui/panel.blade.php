@@ -1,7 +1,7 @@
 @props(['title' => '', 'breadcrumbs' => null])
 @aware(['title' => ''])
 
-<div class="flex flex-col gap-4 p-4 md:p-6">
+<div class="flex min-h-screen flex-col gap-4 p-4 md:p-6">
   <!-- Header -->
   <div class="dynamic-justify flex items-center">
     <!-- Title -->

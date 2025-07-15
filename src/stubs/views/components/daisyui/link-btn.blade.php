@@ -9,6 +9,6 @@
     <i class="{{ $icon }}"></i>
   @endisset
   @isset($label)
-    {{ $label }}
+    {!! $label !!}
   @endisset
 </a>

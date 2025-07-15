@@ -23,7 +23,11 @@
               </a>
             @endif
           </div>
-          <x-daisyui.link-btn href="{{ route('{{ routeprefix }}.create') }}" icon="fas fa-plus" label="Add" />
+          <x-daisyui.link-btn href="{{ route('{{ routeprefix }}.create') }}" icon="fas fa-plus">
+            <x-slot name="label">
+              <span class="hidden sm:inline">Add</span>
+            </x-slot>
+          </x-daisyui.link-btn>
         </div>
 
         <div class="overflow-x-auto border border-base-300 rounded">  
